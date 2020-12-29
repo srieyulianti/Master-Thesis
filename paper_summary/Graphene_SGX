@@ -1,0 +1,22 @@
+Graphene-SGX is an open source library OS that can execute unmodified applications on SGX by providing
+dynamically-loaded libraries and secure multi-process support. Compared to previous libraries such as
+Panoply, Graphene-SGX is actually 5-10% faster. The goal of Graphene is to bring-up rich applications 
+on SGX quickly and then let developers optimize code or reduce the trusted computing base (TCB) as needed.
+SGX in general protects the applications from three different attacks such as in-process attacks from
+outside of the enclave, attacks from OS or hypervisor, and attacks from off-chip hardware. One of the
+advantages given by SGX is application partitioning into multiple enclaves reduces the complexity and can be
+good for security. Furthermore, Graphene-SGX provides a user-policy configuration based on manifest that does
+not allow a program to access any resources which not declared in the manifest. To protect the application 
+from the host file system, the manifest can specify secure hashes (using SHA-256) of trusted files. Graphene-
+SGX also provides multi-processing abstractions such as fork that can create a second enclave and copies
+the parent enclave's contents to reduce the overhead while doing only in a single enclave. As part of initialization,
+the parent and child will exchange a session key using Diffie-Hellman. The enclave includes an OS shield, 
+a library OS, libc, and other user binaries. To secure the enclave from malicious attacks, an enclave must 
+be shielded. However to shield the enclave, it must carefully define the expected behavior of the untrusted 
+system. Due to this, there are several aspects should be carefully defined such as file authentication, 
+memory mappings, threading and exception handling. 
+
+In evaluation section, several applications such as server (Lighttpd, Apache, and NGINX) and Command Line 
+applications (R, GCC and CURL) are tested and performance includes latency and throughput are measured.
+As baseline for comparison, both linux processes and Graphene on a linux host without SGX are used. In terms
+of Trusted Computing Base (TCB) size and shielded functionality, Graphene-SGX is 44% smaller than SCONE.
