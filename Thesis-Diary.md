@@ -19,6 +19,6 @@
 
 ### Action points until next meeting:
   1. SRI: Create and share a list of related literature
-  2. SRI: Set up a template for the MSc thesis on overleaf and share with Nicolae
+  2. (done) SRI: Set up a template for the MSc thesis on overleaf and share with Nicolae: https://www.overleaf.com/project/5ff61a40f9a6ba2d4b379c6c
   3. NICOLAE: Fix the contract with RISE
-  4. SRI: Share time plan for thesis;
+  4. (done) SRI: Share time plan for thesis;
