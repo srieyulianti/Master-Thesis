@@ -22,3 +22,13 @@
   2. (done) SRI: Set up a template for the MSc thesis on overleaf and share with Nicolae: https://www.overleaf.com/project/5ff61a40f9a6ba2d4b379c6c
   3. NICOLAE: Fix the contract with RISE
   4. (done) SRI: Share time plan for thesis;
+
+
+## 2021-01-15
+  1. Discussion about the thesis progress;
+  2. Mention Enarx.dev as an example of a project for application portability across different confidential computing platform architectures;
+
+### Action points until next meeting:
+  1. NICOLAE: Fix the contract with RISE
+  2. NICOLAE: Review the literature list and maybe add more relevant papers and video presentations
+  3. SRI: Continue reading papers in the literature list;
