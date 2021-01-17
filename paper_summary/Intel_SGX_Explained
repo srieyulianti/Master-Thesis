@@ -1,0 +1,26 @@
+##################################################### INTEL SGX EXPLAINED ###############################################
+
+An SGX-enabled processor protects the integrity, confidentiality and freshness of the computation inside an enclave by 
+isolating the enclave's code and data from the outside environment, including the operating system and hypervisor. 
+Security extensions to the Intel architecture, such as Trusted Execution Technology (TXT) and Software Guard Extensions 
+(SGX), rely on the fact that the processor die includes the memory and I/O controller, and thus can prevent any device 
+from accessing protected memory areas via Direct Memory Access (DMA) transfers. The computer powers up, reboots, or 
+resumes from sleep in the  Security phase (SEC). In such a system, the SEC implementation is quite important to take the 
+first steps in establishing the system's measurement, namely resetting the special register that stores the measurement 
+result. Two different attacks such as physical and software attacks are mainly considered as models for SGX design.
+
+Intel SGX relies on Software attestation which is a software running inside an isolated container established by trusted
+hardware can ask the hardware to a small piece of attestation data, producing an attestation signature. The hardware 
+manufacturer acts as a Certificate Authority (CA) and provisions each secure processor that it produces with a unique
+attestation key, which is used to produce attestation signature. Without the requirement to undergo software attestation,
+the computer owner can build any container without constraints, which would make it impossible to reason about the security
+properties of the software inside the container. Intel's SGX leaves the system software in charge of setting up the page 
+tables used by address translation, but instantiates access checks that prevent the system software from directly accessing
+the isolated container's memory.
+
+The enclaves' code and data is stored in Processor Reserved Mmeory (PRM). The contents of enclave and the associated data
+structures are stored in the Enclave Page Cache (EPC), which is a subset of the PRM. In order to perform its security 
+checks, SGX records some information about the system software's allocation decisions for each EPC page in the Enclave Page
+Cache Map (EPCM). The life cycle of an SGX enclave starts from Creation, then Loading, and Initialization, lastly Teardown
+Finally, the SGX design relies on symmetric key cryptography, to guarantee the confidentiality and integrityof the evicted 
+EPC pages, and on nonces to guarantee the freshness of the pages brought back into the EPC.
