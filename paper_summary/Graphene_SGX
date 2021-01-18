@@ -1,3 +1,5 @@
+################ GRAPHENE-SGX : A PRACTICAL LIBRARY OS FOR UNMODIFIED APPLICATIONS ON SGX ###############
+
 Graphene-SGX is an open source library OS that can execute unmodified applications on SGX by providing
 dynamically-loaded libraries and secure multi-process support. Compared to previous libraries such as
 Panoply, Graphene-SGX is actually 5-10% faster. The goal of Graphene is to bring-up rich applications 

@@ -1,3 +1,5 @@
+########################## ENCLAVEDB : A SECURE DATABASE USING SGX #####################################
+
 EnclaveDB ensures high level security such as confidentiality, integrity and freshness by placing sensitive
 data(tables, indexes, and metadata) in enclaves protected by trusted hardware such as Intel SGX. A protoype 
 of EnclaveDB built in this paper is Hekaton, SQL Server's in-memory database engine. As a threat model, this

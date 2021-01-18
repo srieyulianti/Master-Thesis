@@ -1,4 +1,4 @@
-########################### PROTECTING VM REGISTER STATE WITH SEV-ES ################################
+####################################### PROTECTING VM REGISTER STATE WITH SEV-ES #######################################
 
 SEV allows VM's memory encryption with a key unique to that VM and unknown to the hypervisor. However, whenever a VM stops
 running, due to interrupt or other event, its register contents are saved to hypervisor memory and this memory is readable 
