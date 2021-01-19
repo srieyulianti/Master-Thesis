@@ -1,0 +1,27 @@
+################################ SCONE : Secure Linux Containers with Intel SGX ###############################
+
+SCONE is a Secure CONtainer Environment for Docker that uses SGX to run Linux applications in secure containers or enclaves
+to ensure the confidentiality and integrity of the data. SCONE is designed to minimize the size of the Trusted Computing
+Base (TCB) inside and enclave, and to maintain a low performance overhead for secure containers. To reduce the performance
+impact of thread synchronization and system calls within SGX enclaves, SCONE supports user-level threading and asynchronous
+system calls. Moreover, for performance reasons, a secure container design should reduce access to enclave memory. The goal
+of SCONE project is to allow system administrators to build secure container images with the help of Docker in a Trusted
+environment and run secure containers in an untrusted environment.
+
+To achieve the goal, SCONE is designed based on prior design point with an extension on its architecture. SCONE architecture
+consists of an external interface based on system calls to the host OS. SCONE also implements M:N threading to avoid the
+cost of unnecessary enclave transitions. By using asynchronous system call interface to the host OS, the threads inside the
+enclave do not have to exit when performing system calls. Furthermore, SCONE integrates with existing Docker container 
+environments, and ensures that secure containers are compatible with standard Linux containers. To protect several services
+in secure containers, SCONE supports a set of shields such as File system shield, Network Shield over TLS protocol, and 
+Console shield. To integrate SCONE with Docker, it starts from creating an image in the trusted environment, then the image is 
+pushed into a repository in the untrusted environment. Meanwhile in the trusted environment, a SCONE client can trigger
+a Docker engine that is located in the untrusted environment to run the image. Therefore, a Docker engine will request for
+the image from the repository and run the image in an enclave. To validate the enclave, a secure communication via remote
+attestation is built between enclave and the client.
+
+Even though the evaluation shows that SCONE protects unmodified applications with SGX with 0.6x-1.2x of native throughput,
+SCONE has not yet supported several features such as remote attestation and some system calls such as fork, exec, and clone
+due to its user space threading model and the architectural limitations of SGX. However, to configure SCONE with SGX does 
+not require changes to applications or the Linux Kernel that makes SCONE becomes a good option to use.
+
