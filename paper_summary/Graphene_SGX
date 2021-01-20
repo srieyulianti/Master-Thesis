@@ -21,4 +21,8 @@ memory mappings, threading and exception handling.
 In evaluation section, several applications such as server (Lighttpd, Apache, and NGINX) and Command Line 
 applications (R, GCC and CURL) are tested and performance includes latency and throughput are measured.
 As baseline for comparison, both linux processes and Graphene on a linux host without SGX are used. In terms
-of Trusted Computing Base (TCB) size and shielded functionality, Graphene-SGX is 44% smaller than SCONE.
+of Trusted Computing Base (TCB) size and shielded functionality, Graphene-SGX is 44% smaller than SCONE. 
+In a few cases, Graphene-SGX overheads are higher due to internal library OS or fundamental to enclave limitations.
+Furthermore, denial of service, side channels, and controlled channel attacks are beyond the scope of Graphene-SGX.
+Currently, Graphene-SGX does not support two optional kernel extensions such as the one that creates a reference
+monitor to protect the host kernel from the library OS and the one that optimizes fork.
