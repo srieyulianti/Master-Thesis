@@ -1,0 +1,24 @@
+############################ INNOVATIVE TECHNOLOGY FOR CPU BASED ATTESTATION AND SEALING ##########################
+
+To enable attestation and sealing, two instructions are used : EREPORT which provides an evidence structure that is 
+cryptographically bound to the hardware for consumption by attestation verifiers and EGETKEY which provides enclave
+software with access to the "Report" and "Seal" keys used in the attestation and sealing process. For each enclave,
+Intel SGX provides two measurement registers : MRENCLAVE for enclave identity and MRSIGNER for authority identity over
+the enclave. The final value of MRENCLAVE is a SHA-256 digest that identifies, criptographically, the code, data, and
+stack placed inside the enclave. Meanwhile MRSIGNER or Sealing Identity includes sealing authority, product ID and 
+version number. The hardware validates the signature on the certificate, using public key contained within, and then it
+compares the value of the measured MRENCLAVE againsts the signed version.
+
+Intra-Platform Enclave Attestation or local attestation is defined as the process by which one enclave attests its TCB
+to another enclave on the same platform. It uses Intel SGX's EREPORT and EGETKEY instructions. EREPORT generates a 
+cryptographic REPORT that binds MRENCLAVE to the target enclave's REPORT KEY. Meanwhile, EGETKEY provides the REPORT KEY
+to verify the REPORT. It starts from verifying enclave which sends its MRENCLAVE to reporting enclave. Then, reporting
+enclave creates a cryptographic REPORT that includes its MRENCLAVE. Verifying enclave obtains its REPORT KEY and verifies 
+authenticity of the REPORT. Local attestation scheme uses Symmetric - CPU REPORT KEY.
+
+Inter-Platform Enclave Attestation or remote attestation is defined as the process by which one enclave attests its TCB 
+to another entity outside of the platform. Intel SGX Extends Local attestation by allowing a Quoting Enclave (QE) to use 
+Intel EPID to create a QUOTE out of a REPORT. EPID is a group signature scheme. It starts from verifying enclave becomes
+the Quoting Enclave. After verifying the REPORT, the QE signs the REPORT with the EPID private key and converts it into a
+QUOTE. Remote platform verifies the QUOTE with the EPID public key and verifies MRENCLAVE against the expected value. 
+Remote attestation scheme uses Asymmetric-Intel EPID.
