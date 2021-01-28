@@ -36,3 +36,5 @@
       https://arxiv.org/abs/1909.03026
   18. VC3 : Trustworthy Data Analytics in the Cloud using SGX
       https://ieeexplore.ieee.org/document/7163017
+  19. Supporting Third Party Attestation for Intel SGX with Intel Data Center Attestation Primitives
+      https://software.intel.com/sites/default/files/managed/f1/b8/intel-sgx-support-for-third-party-attestation.pdf
