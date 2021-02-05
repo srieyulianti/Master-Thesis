@@ -1,6 +1,6 @@
 ## 2021-02-05
 
-    1. Updates to the research plan and research proposal;
+    1. Updates to the research plan and research proposal: https://www.overleaf.com/4225284659vjxpwdjphhfn
 
 ### Action points until next meeting:
     1. SRI: Propose a design
