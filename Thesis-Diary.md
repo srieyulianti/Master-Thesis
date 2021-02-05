@@ -1,3 +1,13 @@
+## 2021-02-05
+
+    1. Updates to the research plan and research proposal;
+
+### Action points until next meeting:
+    1. SRI: Propose a design
+    2. SRI: Try out running Inclavare and Occlum on AZURE
+    3. NICOLAE: Provide access to an AZURE VM
+
+
 ## 2021-01-29
   1. Reading tips: Compare alternatives between Inclavare: https://inclavare-containers.io/
   2. Reading tips: https://www.ietf.org/archive/id/draft-ietf-teep-architecture-13.txt
