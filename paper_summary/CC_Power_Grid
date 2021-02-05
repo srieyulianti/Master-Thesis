@@ -1,0 +1,26 @@
+###################### CLOUD COMPUTING FOR THE POWER GRID: FROM SERVICE COMPOSITION TO ASSURED CLOUDS ##################
+
+As cloud technology has been adopted by many business providers such as bank industry, there is also possibility to bring
+the electric power industry to use services offered by the cloud technology. There are two reasons that make the electric
+power industry is avoiding to use cloud technology for its business: it does not offer any significant benefit compared to
+dedicated computing infrastructures, or because with today's cloud technology the risks by far outweigh the benefits. Moving
+power applications to the cloud will be beneficial since cloud technology provides several services such as: Time-varying
+computational needs, reliable data storage, ease of access, and open market of utility-oriented computing services.
+
+The migration of power system applications to the cloud would require stringent security guarantees such as confidentiality
+and privacy, integrity, availability and legal compliance. To address the security compliances, two solutions are offered:
+composing assured services and assured cloud computing. By using composing assured services scenario, the necessary 
+confidentiality and privacy protection could be achieved using encryption technique. One of the encryption technique is
+using homomorphic encryption techniques. However, these techniques are limited in the types of computation that they 
+can support, and those that could compute arbitrary functions impose significant computational overhead and are far from
+practical. By using assured cloud computing, confidentiality and integrity of communications to and from the cloud can be
+ensured by standard cryptographic protocols (e.g. TLS and IPsec), strong guarantees of isolation between tenant VMs are 
+needed. If both techniques are put all together, a bit set of assured cloud computing services will be used to compose
+secure and available applications.
+
+The question is still whether the security requirements can be addressed at a complexity and cost that do not outweigh the
+benefits of moving to clouds. But as the cloud computing paradigm takes off it is conceivable that hardware tailored for
+multi-tenacy with certain built-in protections will become available paving the way for assured cloud computing that can 
+support power grid applications at a reasonable cost.
+
+
