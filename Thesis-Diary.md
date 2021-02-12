@@ -1,3 +1,13 @@
+## 2021-02-12
+    1. Nicoale provided access to the Azure vm;
+    2. Sri investigated several existing use cases;
+    3. Discussion about the architecture;
+
+### Action points until next meeting:
+        1. SRI: Draw a (better) sketch of the architecture
+        2. SRI: On the sketch start thinking how to evaluate the final system;
+
+
 ## 2021-02-05
 
     1. Updates to the research plan and research proposal: https://www.overleaf.com/4225284659vjxpwdjphhfn
