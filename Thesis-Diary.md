@@ -1,5 +1,17 @@
+## 2021-02-26
+    1. Focus on learning the tools - Occlum and SGX;
+    2. Drew the architecture;
+    3. Additional aspect to investigate: is there a way to terminate the enclave
+    in a "lightweight" way (without e.g. terminating the VM).
+
+### Action points until next meeting:
+        1. Next steps: (a) figure out how to do attestation with SDCSA(?)
+        (data center attestation primitives)
+        2. Next steps: (b) illustrate/describe the attestation process
+        (we will discuss this next time)
+
 ## 2021-02-12
-    1. Nicoale provided access to the Azure vm;
+    1. Nicolae provided access to the Azure vm;
     2. Sri investigated several existing use cases;
     3. Discussion about the architecture;
 
