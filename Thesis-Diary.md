@@ -5,7 +5,7 @@
     in a "lightweight" way (without e.g. terminating the VM).
 
 ### Action points until next meeting:
-        1. Next steps: (a) figure out how to do attestation with SDCSA(?)
+        1. Next steps: (a) figure out how to do attestation with ECDSA
         (data center attestation primitives)
         2. Next steps: (b) illustrate/describe the attestation process
         (we will discuss this next time)
