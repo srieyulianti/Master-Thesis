@@ -1,3 +1,14 @@
+## 2021-03-05
+    1. Discussing the attestation architecture;
+    2. Question - What is the attestation key;
+    3. Discussion about potential project continuation.
+
+### Action points until next meeting:
+    1. Continue development as it is;
+
+### Action points until next meeting:
+
+
 ## 2021-02-26
     1. Focus on learning the tools - Occlum and SGX;
     2. Drew the architecture;
