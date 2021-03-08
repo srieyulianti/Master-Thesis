@@ -1,0 +1,37 @@
+Format: 1.8
+Date: Thu, 10 Oct 2019 15:19:41 +0800
+Source: sgx-dcap-pccs
+Binary: sgx-dcap-pccs
+Architecture: source amd64
+Version: 1.10.100.4-bionic1
+Distribution: unstable
+Urgency: low
+Maintainer: <xiangquan.liu@intel.com>
+Changed-By: Xiangquan Liu <xiangquan.liu@intel.com>
+Description:
+ sgx-dcap-pccs - Intel(R) Software Guard Extensions PCK Caching Service
+Changes:
+ sgx-dcap-pccs (1.10.100.4-bionic1) unstable; urgency=low
+ .
+   * Initial release
+Checksums-Sha1:
+ 385c23cf5714460eeaae7c8ff8098e59ef71da3d 950 sgx-dcap-pccs_1.10.100.4-bionic1.dsc
+ c85c25f9226d6f7407c7829319d733de97b3bd38 1631683 sgx-dcap-pccs_1.10.100.4.orig.tar.gz
+ 73feb91461333aaa51f5f06c60c18ea8485df48b 3252 sgx-dcap-pccs_1.10.100.4-bionic1.debian.tar.xz
+ 6dd9212d7f7775d045858517af99bf7416219c8c 93916 sgx-dcap-pccs-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ f2705400598cbff49249877b21f95a3e414fbc9f 6043 sgx-dcap-pccs_1.10.100.4-bionic1_amd64.buildinfo
+ 0d8508e1b2656c87eb6b1a1f03c56d9176c33d5c 1220644 sgx-dcap-pccs_1.10.100.4-bionic1_amd64.deb
+Checksums-Sha256:
+ 645824f1b5e7e275c65fcd3c31cee0b6d1bac1e4874ac8f5b217d888ac952c5b 950 sgx-dcap-pccs_1.10.100.4-bionic1.dsc
+ ce1b4b048d553efca695eacf02dda917e82472a0b8691b4d7188963e14d857eb 1631683 sgx-dcap-pccs_1.10.100.4.orig.tar.gz
+ e779dc456d1ef5983ea9e4c497bee894789bfe3ccc63b6616e211077ac45db2c 3252 sgx-dcap-pccs_1.10.100.4-bionic1.debian.tar.xz
+ 99aae51de3b5312050355d69ac596ec63ac496b4b9015d139bbde6975f3443e9 93916 sgx-dcap-pccs-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ 19203360347ef24ac1c08c388725079e256c3b23a3af4df80fbed6e6a8cd7ce3 6043 sgx-dcap-pccs_1.10.100.4-bionic1_amd64.buildinfo
+ 04fe170bbf47963bd8c3f06f998936e230d493706205d5969960d62e7bbffb21 1220644 sgx-dcap-pccs_1.10.100.4-bionic1_amd64.deb
+Files:
+ c057cf7a5df0cf84383caab87ef09dd0 950 web optional sgx-dcap-pccs_1.10.100.4-bionic1.dsc
+ 0c3ae4b2baf5e9c3f58b6d34d42f6c59 1631683 web optional sgx-dcap-pccs_1.10.100.4.orig.tar.gz
+ 75a90deb930f6c7b71809e3fc82b4ecb 3252 web optional sgx-dcap-pccs_1.10.100.4-bionic1.debian.tar.xz
+ 19f12a22d8da8c15ed83992db01bdb5d 93916 debug optional sgx-dcap-pccs-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ 6fe7b362bb24855cc2da50f6f77a220e 6043 web optional sgx-dcap-pccs_1.10.100.4-bionic1_amd64.buildinfo
+ 2cf2820bff9038c21489c427019d465c 1220644 web optional sgx-dcap-pccs_1.10.100.4-bionic1_amd64.deb

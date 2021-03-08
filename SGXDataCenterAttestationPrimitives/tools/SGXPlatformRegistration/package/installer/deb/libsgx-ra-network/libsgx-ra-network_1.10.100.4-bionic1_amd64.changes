@@ -1,0 +1,41 @@
+Format: 1.8
+Date: Mon, 10 Feb 2020 15:19:41 +0800
+Source: libsgx-ra-network
+Binary: libsgx-ra-network libsgx-ra-network-dev
+Architecture: source amd64
+Version: 1.10.100.4-bionic1
+Distribution: unstable
+Urgency: low
+Maintainer: <junli.sun@intel.com>
+Changed-By: Junli Sun <junli.sun@intel.com>
+Description:
+ libsgx-ra-network - Intel(R) Software Guard Extensions Registration Agent network lib
+ libsgx-ra-network-dev - Intel(R) Software Guard Extensions Registration Agent network lib
+Changes:
+ libsgx-ra-network (1.10.100.4-bionic1) unstable; urgency=low
+ .
+   * Initial release
+Checksums-Sha1:
+ 304a5c36a6f2aeace67de6bb6bd4bd8f59dcace7 1057 libsgx-ra-network_1.10.100.4-bionic1.dsc
+ 89de5a196096426e1684d149206c056aea2f06fc 19375 libsgx-ra-network_1.10.100.4.orig.tar.gz
+ db359994575efcd3e8a66fb720206ece3a22f314 3128 libsgx-ra-network_1.10.100.4-bionic1.debian.tar.xz
+ 1fe8f6eaf52ade7992cfa306d7b373479e7aed07 3468 libsgx-ra-network-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ ab09988b27a19d784f51dfeb565c9211f405292f 5220 libsgx-ra-network-dev_1.10.100.4-bionic1_amd64.deb
+ ca8623d385888c6a76a8d65f75f3823f6d534158 6414 libsgx-ra-network_1.10.100.4-bionic1_amd64.buildinfo
+ 140d64d4d7e14c08186ebcfbbb23445d3526dfa1 13832 libsgx-ra-network_1.10.100.4-bionic1_amd64.deb
+Checksums-Sha256:
+ 9e5ae94d4684b8b9b4628c768964b89c2a54148019e613fad09e99ba62383cbd 1057 libsgx-ra-network_1.10.100.4-bionic1.dsc
+ ca69fe264f5eac82fa451c051a9bafc9239795ec9ef91647e9c944015b878e3d 19375 libsgx-ra-network_1.10.100.4.orig.tar.gz
+ 6e496061bec543a9194cb2bda29c52fc6c899ab35a6030a2614f294a68830a86 3128 libsgx-ra-network_1.10.100.4-bionic1.debian.tar.xz
+ 80b2a2c45b3793c1736ea8f11ed989c2a3e3ff135f24ce72f9c93a1b6c385a92 3468 libsgx-ra-network-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ 44cdb43847b63c3f8ed140abc501af2e9b274c320a8d748348487e3ca9de612b 5220 libsgx-ra-network-dev_1.10.100.4-bionic1_amd64.deb
+ 0f742cd17a4a3b04140eb162df210bfa2819701adaf3ada12353e54d126eac09 6414 libsgx-ra-network_1.10.100.4-bionic1_amd64.buildinfo
+ 68dcc12ea20eba5822532c8549f7196186183e3f9e5893e8ba277514fab435d7 13832 libsgx-ra-network_1.10.100.4-bionic1_amd64.deb
+Files:
+ 0becbb5bc28f0cbae36d48b915f867f9 1057 libs optional libsgx-ra-network_1.10.100.4-bionic1.dsc
+ f068aa531f7f1e7f34f8549a2ebb44a0 19375 libs optional libsgx-ra-network_1.10.100.4.orig.tar.gz
+ 8e23e31edf99c4f1b6f91893fa78a068 3128 libs optional libsgx-ra-network_1.10.100.4-bionic1.debian.tar.xz
+ 851a64c7f53e984cb35e7f80d57da8e8 3468 debug optional libsgx-ra-network-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ 5b8971cf2cebf7589e6e74eaf511e9f7 5220 devel optional libsgx-ra-network-dev_1.10.100.4-bionic1_amd64.deb
+ 811f4af4123487ff680089dbe0b3dd61 6414 libs optional libsgx-ra-network_1.10.100.4-bionic1_amd64.buildinfo
+ cf6e3cccfdc7cac5db3d311bcd99ec3c 13832 libs optional libsgx-ra-network_1.10.100.4-bionic1_amd64.deb

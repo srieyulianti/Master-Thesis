@@ -1,0 +1,37 @@
+Format: 1.8
+Date: Fri, 24 Apr 2020 15:19:41 +0800
+Source: sgx-pck-id-retrieval-tool
+Binary: sgx-pck-id-retrieval-tool
+Architecture: source amd64
+Version: 1.10.100.4-bionic1
+Distribution: unstable
+Urgency: low
+Maintainer: Junli Sun <junli.sun@intel.com>
+Changed-By: Junli Sun <junli.sun@intel.com>
+Description:
+ sgx-pck-id-retrieval-tool - Intel(R) Software Guard Extensions: this tool is used to collect
+Changes:
+ sgx-pck-id-retrieval-tool (1.10.100.4-bionic1) unstable; urgency=low
+ .
+   * Initial release
+Checksums-Sha1:
+ 31cb6992988c527f59dd6ab443e9ec707acd1d5d 1063 sgx-pck-id-retrieval-tool_1.10.100.4-bionic1.dsc
+ bf29d48dee595f07cef8e8df3200dbfa8711f701 50662 sgx-pck-id-retrieval-tool_1.10.100.4.orig.tar.gz
+ 8e796a5b5be0c4931bf62b8a77bb50417a758faf 2212 sgx-pck-id-retrieval-tool_1.10.100.4-bionic1.debian.tar.xz
+ 0f3a1ba2ad8e6a04cb604792fccc5b146ab2abc4 9824 sgx-pck-id-retrieval-tool-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ 2aec7a14307263a25df924a9bdb1512543b6daa5 6169 sgx-pck-id-retrieval-tool_1.10.100.4-bionic1_amd64.buildinfo
+ 26b7b40c46e64fede13f73694480c27ae1771253 38168 sgx-pck-id-retrieval-tool_1.10.100.4-bionic1_amd64.deb
+Checksums-Sha256:
+ 6e1efa321fce31072ff61ba99a0a7616545ef6a1446ab7ea72908e914c994bb5 1063 sgx-pck-id-retrieval-tool_1.10.100.4-bionic1.dsc
+ 147ab46d1534a68889d82a727c3e2c62e8460a58e3bfa6af30b35af0503f5908 50662 sgx-pck-id-retrieval-tool_1.10.100.4.orig.tar.gz
+ 19a88685838ca63d7da400293d4c3711e8450a74d62b60340865a1e1bd5731db 2212 sgx-pck-id-retrieval-tool_1.10.100.4-bionic1.debian.tar.xz
+ af6f4283caa208e9fc1e8136a48d8c48c12d2de06f0566e6cf55d71fe4b7fc77 9824 sgx-pck-id-retrieval-tool-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ 40660dc3b5f71ee9e0a365ebed127c4630e43d89787daafd88968d8cf107fd04 6169 sgx-pck-id-retrieval-tool_1.10.100.4-bionic1_amd64.buildinfo
+ 35247fd93fb711bf1dd2b382ed5dbe68cbe3fe67b2f31ebfe46ceebf4b59db53 38168 sgx-pck-id-retrieval-tool_1.10.100.4-bionic1_amd64.deb
+Files:
+ 234567282025e799ab05ff12fb72ced4 1063 misc optional sgx-pck-id-retrieval-tool_1.10.100.4-bionic1.dsc
+ d50a6ab52703b23155dec7886a6db2c2 50662 misc optional sgx-pck-id-retrieval-tool_1.10.100.4.orig.tar.gz
+ 3d6f039e84724388d62562d0486781bc 2212 misc optional sgx-pck-id-retrieval-tool_1.10.100.4-bionic1.debian.tar.xz
+ 860c647bfd854c431eee5c071f9b4c13 9824 debug optional sgx-pck-id-retrieval-tool-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ 3916c3df4831ebe63bb7d84088b068c3 6169 misc optional sgx-pck-id-retrieval-tool_1.10.100.4-bionic1_amd64.buildinfo
+ 05fcffe036f18c0324b9672e724671a6 38168 misc optional sgx-pck-id-retrieval-tool_1.10.100.4-bionic1_amd64.deb

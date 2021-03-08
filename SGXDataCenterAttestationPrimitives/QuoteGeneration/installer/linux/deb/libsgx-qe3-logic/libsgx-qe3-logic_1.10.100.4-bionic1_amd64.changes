@@ -1,0 +1,40 @@
+Format: 1.8
+Date: Mon, 20 Jan 2020 15:19:41 +0800
+Source: libsgx-qe3-logic
+Binary: libsgx-qe3-logic
+Architecture: source amd64
+Version: 1.10.100.4-bionic1
+Distribution: unstable
+Urgency: low
+Maintainer: <xiangquan.liu@intel.com>
+Changed-By: Xiangquan Liu <xiangquan.liu@intel.com>
+Description:
+ libsgx-qe3-logic - Intel(R) Software Guard Extensions Data Center Attestation Primit
+Changes:
+ libsgx-qe3-logic (1.10.100.4-bionic1) unstable; urgency=low
+ .
+   * 1.0 Gold release
+   * Provide the Quote Verification Library and sample project. Please note this library is only provided in source code in the Intel® SGX DCAP project repo
+   * Provide the Quote Generation Library and sample project
+   * Provide the sample project for Platform Provider Library
+Checksums-Sha1:
+ d9522c713d7b8ebbb0afe9e0a5986b8ca88611b7 976 libsgx-qe3-logic_1.10.100.4-bionic1.dsc
+ 32bab6219728d550156d6e21a9cf995bad0b09f1 55469 libsgx-qe3-logic_1.10.100.4.orig.tar.gz
+ 9c3f768f06361a9d0833a5308733a8ce22670b87 2264 libsgx-qe3-logic_1.10.100.4-bionic1.debian.tar.xz
+ 74b0e50fb375b9140a63e554fd755682f9a0f8e6 42164 libsgx-qe3-logic-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ 012bfc565a2373a45ddf6112c95e2f2d59a3798b 6070 libsgx-qe3-logic_1.10.100.4-bionic1_amd64.buildinfo
+ 6b48ea543c5fb7f46371718e1e9d692f7db686d3 12412 libsgx-qe3-logic_1.10.100.4-bionic1_amd64.deb
+Checksums-Sha256:
+ 89c4165b80e01d184077145b90298069628362dd740272680f86f2f7d5d614ae 976 libsgx-qe3-logic_1.10.100.4-bionic1.dsc
+ 89d778504b7942b504b0604416cb6602e2f1b25b36d7376dbfd58975eb809f9e 55469 libsgx-qe3-logic_1.10.100.4.orig.tar.gz
+ f8d48760a710b7bb5aa76fd6db0a6ecbf701e78a1c066ae79e358fc484ef12ab 2264 libsgx-qe3-logic_1.10.100.4-bionic1.debian.tar.xz
+ aa14828544ef74338f388c4c990ed0bc3f3c1279db967a126f97fb6221fad140 42164 libsgx-qe3-logic-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ 54ebe028bba4e9bf6b8649f239409017a5026b8674e677b52c8f0fa06674a366 6070 libsgx-qe3-logic_1.10.100.4-bionic1_amd64.buildinfo
+ 93b057d1acbabaab425b8b46c17fb1f6f662befc03ab934bb1176cf4ce90f413 12412 libsgx-qe3-logic_1.10.100.4-bionic1_amd64.deb
+Files:
+ a1e94647ad8171a87c5f1b86d584cc9c 976 libs optional libsgx-qe3-logic_1.10.100.4-bionic1.dsc
+ 86b587efdae252aa467dcaa60218b837 55469 libs optional libsgx-qe3-logic_1.10.100.4.orig.tar.gz
+ 2d5d6132a57319f02a7cd819fc55b57e 2264 libs optional libsgx-qe3-logic_1.10.100.4-bionic1.debian.tar.xz
+ ef9abb243173912b6d7989bd01bb1da5 42164 debug optional libsgx-qe3-logic-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ cedeea8456b18a10bfcef4d042d554f5 6070 libs optional libsgx-qe3-logic_1.10.100.4-bionic1_amd64.buildinfo
+ 1cec5ec6637a6b6b3603f7135c92f717 12412 libs optional libsgx-qe3-logic_1.10.100.4-bionic1_amd64.deb

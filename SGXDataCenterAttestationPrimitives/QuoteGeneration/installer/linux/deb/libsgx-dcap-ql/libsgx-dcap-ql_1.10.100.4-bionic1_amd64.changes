@@ -1,0 +1,45 @@
+Format: 1.8
+Date: Thu, 10 Oct 2019 15:19:41 +0800
+Source: libsgx-dcap-ql
+Binary: libsgx-dcap-ql libsgx-dcap-ql-dev
+Architecture: source amd64
+Version: 1.10.100.4-bionic1
+Distribution: unstable
+Urgency: low
+Maintainer: <xiangquan.liu@intel.com>
+Changed-By: Xiangquan Liu <xiangquan.liu@intel.com>
+Description:
+ libsgx-dcap-ql - Intel(R) Software Guard Extensions Data Center Attestation Primit
+ libsgx-dcap-ql-dev - Intel(R) Software Guard Extensions Data Center Attestation Primit
+Changes:
+ libsgx-dcap-ql (1.10.100.4-bionic1) unstable; urgency=low
+ .
+   * 1.0 Gold release
+   * Provide the Quote Verification Library and sample project. Please note this library is only provided in source code in the Intel® SGX DCAP project repo
+   * Provide the Quote Generation Library and sample project
+   * Provide the sample project for Platform Provider Library
+   * Separate the Quote Verification Library into a standalone installer
+Checksums-Sha1:
+ f607d7789a3c21a6cae45390dde21fa597d9c4ec 1028 libsgx-dcap-ql_1.10.100.4-bionic1.dsc
+ 80393471f926a7c5845a309a2ee7ba190136c2d8 24463 libsgx-dcap-ql_1.10.100.4.orig.tar.gz
+ d3190f2eed937acb4baa20ba4b363ad018ca4208 2400 libsgx-dcap-ql_1.10.100.4-bionic1.debian.tar.xz
+ c3a696d69c6367fe4a53a03a18b54bc9c01c2ab3 18724 libsgx-dcap-ql-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ d157b0f6de9628e10b7afc9c491d62c208f273e4 3460 libsgx-dcap-ql-dev_1.10.100.4-bionic1_amd64.deb
+ 8266aa708b42c6cfb4dae36967db7b4aba99a757 6368 libsgx-dcap-ql_1.10.100.4-bionic1_amd64.buildinfo
+ 7cc5c6d1a86d9ad0f2b0884cd365dc22608a18f7 6064 libsgx-dcap-ql_1.10.100.4-bionic1_amd64.deb
+Checksums-Sha256:
+ 0232264d295ceb865efa5b03d7167e5c332648011b5f9e36052f53037506fc78 1028 libsgx-dcap-ql_1.10.100.4-bionic1.dsc
+ e465ac20788f11036a8b4b36a78dacda5c62c2b16dd5b4ae1103b050b2f1f807 24463 libsgx-dcap-ql_1.10.100.4.orig.tar.gz
+ 52b17c660cc8c4347c8566745feb0c68de0fa2049c879812eb658240412eea69 2400 libsgx-dcap-ql_1.10.100.4-bionic1.debian.tar.xz
+ fe9b6189729fadac0ed9bba25db5b239856fa6e690f4f753160627cc99fa1bbd 18724 libsgx-dcap-ql-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ fb6e7182ea74037a0a9364a2302763ad9373de6a3b5c47e77808dbf982bb4c11 3460 libsgx-dcap-ql-dev_1.10.100.4-bionic1_amd64.deb
+ bacdd0da0c014805bbca608bcb9cd6413dba36f8a5f9f10f9a293e6d9a8f3d64 6368 libsgx-dcap-ql_1.10.100.4-bionic1_amd64.buildinfo
+ ffee56037a3fee5362e487f114ad59711d573a80b555bf4a6d2461fc6eccd912 6064 libsgx-dcap-ql_1.10.100.4-bionic1_amd64.deb
+Files:
+ d045712bf9389862b64244727f4be476 1028 libs optional libsgx-dcap-ql_1.10.100.4-bionic1.dsc
+ 153ee2d13800f78b49b6b79daa873fc1 24463 libs optional libsgx-dcap-ql_1.10.100.4.orig.tar.gz
+ 7c34b005958ce7eb21e20b273fa8f212 2400 libs optional libsgx-dcap-ql_1.10.100.4-bionic1.debian.tar.xz
+ da13b57c777e6952b1260446eca82432 18724 debug optional libsgx-dcap-ql-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ 0e39a3e8c11cf5d32b9c4205c8810575 3460 devel optional libsgx-dcap-ql-dev_1.10.100.4-bionic1_amd64.deb
+ 42544805e003c447cb58b00ff56df667 6368 libs optional libsgx-dcap-ql_1.10.100.4-bionic1_amd64.buildinfo
+ 532773a1b17facff769474b9c7bf1ff5 6064 libs optional libsgx-dcap-ql_1.10.100.4-bionic1_amd64.deb

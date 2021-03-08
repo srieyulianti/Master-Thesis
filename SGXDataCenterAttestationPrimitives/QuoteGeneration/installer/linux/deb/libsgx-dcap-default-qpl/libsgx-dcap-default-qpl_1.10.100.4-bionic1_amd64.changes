@@ -1,0 +1,41 @@
+Format: 1.8
+Date: Thu, 10 Oct 2019 15:19:41 +0800
+Source: libsgx-dcap-default-qpl
+Binary: libsgx-dcap-default-qpl libsgx-dcap-default-qpl-dev
+Architecture: source amd64
+Version: 1.10.100.4-bionic1
+Distribution: unstable
+Urgency: low
+Maintainer: <xiangquan.liu@intel.com>
+Changed-By: Xiangquan Liu <xiangquan.liu@intel.com>
+Description:
+ libsgx-dcap-default-qpl - Intel(R) Software Guard Extensions Default Quote Provider Library
+ libsgx-dcap-default-qpl-dev - Intel(R) Software Guard Extensions Default Quote Provider Library
+Changes:
+ libsgx-dcap-default-qpl (1.10.100.4-bionic1) unstable; urgency=low
+ .
+   * Initial release
+Checksums-Sha1:
+ 76cd0f588295fbcfbaf4abce4405af2d2e6f86cb 1130 libsgx-dcap-default-qpl_1.10.100.4-bionic1.dsc
+ 0d5686aaaa04178d389d352af0877af410ee5793 585642 libsgx-dcap-default-qpl_1.10.100.4.orig.tar.gz
+ 0ea2eaf84203040e9e8f09a5c5c584a99d3bfff6 2232 libsgx-dcap-default-qpl_1.10.100.4-bionic1.debian.tar.xz
+ f355973b32f707e16141f07bec09a0755b894dc5 520216 libsgx-dcap-default-qpl-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ 940ddce8806af186d1b0fb7f10487bf4671a1518 2772 libsgx-dcap-default-qpl-dev_1.10.100.4-bionic1_amd64.deb
+ cbd2cd5ea444e99d851befd2a6ae844a3e1d3b41 6509 libsgx-dcap-default-qpl_1.10.100.4-bionic1_amd64.buildinfo
+ a96e69889fbc96c8782f6ca85689807d6301116f 52136 libsgx-dcap-default-qpl_1.10.100.4-bionic1_amd64.deb
+Checksums-Sha256:
+ d6065342ad96e79ad81b566ba15222f8d5982271707d6bd0428d3d3c1613dfaa 1130 libsgx-dcap-default-qpl_1.10.100.4-bionic1.dsc
+ 6ff7d856177f9678edeb38288182b421d699b1d91d8d0f5fd06d2ce71fde1ef3 585642 libsgx-dcap-default-qpl_1.10.100.4.orig.tar.gz
+ 062c4e0b4944880804c73668b186da716ac4d687f9390450c3c4a5b9ffbee473 2232 libsgx-dcap-default-qpl_1.10.100.4-bionic1.debian.tar.xz
+ cd3385c9fdb0fd59c22940efc568c63d05ff6c206135acf00faf10ec4dd75974 520216 libsgx-dcap-default-qpl-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ e60b2545deb0d549a6d94b8670c8c37f0cc3f92bb862a1d405f5d98e20fbe9e9 2772 libsgx-dcap-default-qpl-dev_1.10.100.4-bionic1_amd64.deb
+ c60b0a668fef31317c2a5c784f8cde139343b7f9871e89cdc046b7cf70d533af 6509 libsgx-dcap-default-qpl_1.10.100.4-bionic1_amd64.buildinfo
+ bd8edb36e1cdcef1ac02584493e28fc8edc4b6cbbbdc3f182a2df7a7761affa4 52136 libsgx-dcap-default-qpl_1.10.100.4-bionic1_amd64.deb
+Files:
+ 22180bef3178bf2eeafb337c5b0389dd 1130 libs optional libsgx-dcap-default-qpl_1.10.100.4-bionic1.dsc
+ 88d5fad3d741cdfe3477b8b37766ba6a 585642 libs optional libsgx-dcap-default-qpl_1.10.100.4.orig.tar.gz
+ 88cd56545a8237547ca232c97b336969 2232 libs optional libsgx-dcap-default-qpl_1.10.100.4-bionic1.debian.tar.xz
+ 2aed737cfecc188936c0a74cb2d5eafd 520216 debug optional libsgx-dcap-default-qpl-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ 72c77db33f8fd5ba476e1deae6f45190 2772 devel optional libsgx-dcap-default-qpl-dev_1.10.100.4-bionic1_amd64.deb
+ 4e2ffce0dae95bd42c908ed04e89e3fd 6509 libs optional libsgx-dcap-default-qpl_1.10.100.4-bionic1_amd64.buildinfo
+ 388aca03cf688f3f95f9fb8d7f244d6e 52136 libs optional libsgx-dcap-default-qpl_1.10.100.4-bionic1_amd64.deb

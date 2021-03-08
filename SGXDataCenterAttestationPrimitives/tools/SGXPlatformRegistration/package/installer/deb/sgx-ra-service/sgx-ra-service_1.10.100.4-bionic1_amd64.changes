@@ -1,0 +1,37 @@
+Format: 1.8
+Date: Mon, 10 Feb 2020 15:19:41 +0800
+Source: sgx-ra-service
+Binary: sgx-ra-service
+Architecture: source amd64
+Version: 1.10.100.4-bionic1
+Distribution: unstable
+Urgency: low
+Maintainer: Junli Sun <junli.sun@intel.com>
+Changed-By: Junli Sun <junli.sun@intel.com>
+Description:
+ sgx-ra-service - Intel(R) Software Guard Extensions Multi-Package Registration Age
+Changes:
+ sgx-ra-service (1.10.100.4-bionic1) unstable; urgency=low
+ .
+   * Initial release
+Checksums-Sha1:
+ da49db013c34b5c6e3dbdf31c256208b2edfe940 964 sgx-ra-service_1.10.100.4-bionic1.dsc
+ 2bba56ac5005eba3777f170d80c5ec81956505b4 33953 sgx-ra-service_1.10.100.4.orig.tar.gz
+ 56381ee6d6ffd11c0e24e26e7eb44faff3ae175d 3676 sgx-ra-service_1.10.100.4-bionic1.debian.tar.xz
+ 33c77e9961e0d32033380822fbdb6c20a61600ec 6296 sgx-ra-service-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ c467f1fdddfb1a190d2b992fdb5be62fb7f6582b 6046 sgx-ra-service_1.10.100.4-bionic1_amd64.buildinfo
+ f1430199c0c56496afe9b67c1bdb36b19d165e0d 22216 sgx-ra-service_1.10.100.4-bionic1_amd64.deb
+Checksums-Sha256:
+ 8040bbe902c58dbf7fc6d34181a532750411326cefaee44c246842b67b65ce06 964 sgx-ra-service_1.10.100.4-bionic1.dsc
+ 3328955f801c758b1bdb9fc4dc7545001a29ec3e30309f42dee8805fbd66e27c 33953 sgx-ra-service_1.10.100.4.orig.tar.gz
+ d72b99f55c4eb5e99b46590f5d551e0ef61268fbdfd3443560cf795686729f09 3676 sgx-ra-service_1.10.100.4-bionic1.debian.tar.xz
+ 8472c67bbeb28c14f9ecfb6e59693784204cd302292d61aa2348fdb73b5a7e14 6296 sgx-ra-service-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ a440f12264afaed83c1a21846837b97ebdc6450236c33dc48aadb678ca692d31 6046 sgx-ra-service_1.10.100.4-bionic1_amd64.buildinfo
+ 47bf9c0845ee11c220f8dbecfddbf93f1b931ae784edf9fb1e38e7faf86192bd 22216 sgx-ra-service_1.10.100.4-bionic1_amd64.deb
+Files:
+ 4edb5a252a2276acad2d3338c7a3bffb 964 misc optional sgx-ra-service_1.10.100.4-bionic1.dsc
+ 2286e832a0636b5c0a39f737bc53ba03 33953 misc optional sgx-ra-service_1.10.100.4.orig.tar.gz
+ 4c7052cb01e16069d36187f72952f8f1 3676 misc optional sgx-ra-service_1.10.100.4-bionic1.debian.tar.xz
+ ee6b1c421c68a601194e9c500ff3cc45 6296 debug optional sgx-ra-service-dbgsym_1.10.100.4-bionic1_amd64.ddeb
+ c479d4b9d7b1b5212334724d07ae91c5 6046 misc optional sgx-ra-service_1.10.100.4-bionic1_amd64.buildinfo
+ 1def6c25570899a69f33601be09f2961 22216 misc optional sgx-ra-service_1.10.100.4-bionic1_amd64.deb

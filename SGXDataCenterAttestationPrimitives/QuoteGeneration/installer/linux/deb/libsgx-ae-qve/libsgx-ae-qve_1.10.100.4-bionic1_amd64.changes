@@ -1,0 +1,34 @@
+Format: 1.8
+Date: Thu, 10 Oct 2019 15:19:41 +0800
+Source: libsgx-ae-qve
+Binary: libsgx-ae-qve
+Architecture: source amd64
+Version: 1.10.100.4-bionic1
+Distribution: unstable
+Urgency: low
+Maintainer: <xiangquan.liu@intel.com>
+Changed-By: Xiangquan Liu <xiangquan.liu@intel.com>
+Description:
+ libsgx-ae-qve - Intel(R) Software Guard Extensions QVE
+Changes:
+ libsgx-ae-qve (1.10.100.4-bionic1) unstable; urgency=low
+ .
+   * Initial release
+Checksums-Sha1:
+ 680150ce65b541411a87a3f1ba6c2a46805ac695 955 libsgx-ae-qve_1.10.100.4-bionic1.dsc
+ 29f0821991c1e50d59b57a53ea971627a0a68209 1428026 libsgx-ae-qve_1.10.100.4.orig.tar.gz
+ b185597208bc7bdc79586661fafa9bd2ed88f9f4 2100 libsgx-ae-qve_1.10.100.4-bionic1.debian.tar.xz
+ 4964e93ecda3ebc694cfada9f75e8682d729ab75 5730 libsgx-ae-qve_1.10.100.4-bionic1_amd64.buildinfo
+ 68298853ea045438f053d87595c38112f8e39f59 1132552 libsgx-ae-qve_1.10.100.4-bionic1_amd64.deb
+Checksums-Sha256:
+ 5513dbac4bbd3bcc8698d9d0afd8212a0966529e37bd837f95c304d9a0ad2a15 955 libsgx-ae-qve_1.10.100.4-bionic1.dsc
+ f462355245180bd3a0f7beba918ca41a7420c28ce28229959d3f190536197bdb 1428026 libsgx-ae-qve_1.10.100.4.orig.tar.gz
+ 308d6665036378b47a9247627121ed5fc57a58c5bddd3c7c869f9f42e5e741fa 2100 libsgx-ae-qve_1.10.100.4-bionic1.debian.tar.xz
+ 8d4ddefa3e91c2b313186e7fd1c5c650d05025162be682c41fcb36f355610778 5730 libsgx-ae-qve_1.10.100.4-bionic1_amd64.buildinfo
+ 9c5338194fcae8bfcd2033e9c9b6f310538a3a5157d2de43e774d686937057c7 1132552 libsgx-ae-qve_1.10.100.4-bionic1_amd64.deb
+Files:
+ 93951b1e0b17a14256948515f57b8b39 955 libs optional libsgx-ae-qve_1.10.100.4-bionic1.dsc
+ b4a84dfaeeeffa9d301253c650af2091 1428026 libs optional libsgx-ae-qve_1.10.100.4.orig.tar.gz
+ f3bd0e939726fd5d4a88ed0126c6256b 2100 libs optional libsgx-ae-qve_1.10.100.4-bionic1.debian.tar.xz
+ a4ac98740827493c94db3a6b47c12496 5730 libs optional libsgx-ae-qve_1.10.100.4-bionic1_amd64.buildinfo
+ bbe5e35f7fb72d7b2fdb501eec9aabef 1132552 libs optional libsgx-ae-qve_1.10.100.4-bionic1_amd64.deb

@@ -1,0 +1,13 @@
+{
+global:
+    sgx_ql_get_quote;
+    sgx_ql_get_quote_size;
+    sgx_ql_init_quote;
+    sgx_ql_set_enclave_load_policy;
+    sgx_set_qe3_path;
+    sgx_set_qpl_path;
+    sgx_ql_get_keyid;
+    load_qe;
+local:
+    *;
+};
