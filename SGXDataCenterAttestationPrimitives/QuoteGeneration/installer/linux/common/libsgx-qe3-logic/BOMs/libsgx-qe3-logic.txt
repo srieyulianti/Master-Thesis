@@ -1,3 +1,0 @@
-DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
-<deliverydir>/build/linux/libsgx_qe3_logic.so	<installdir>/lib/libsgx_qe3_logic.so	0	main	STP
-
