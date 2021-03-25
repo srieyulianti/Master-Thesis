@@ -53,7 +53,7 @@ int main() {
     printf("cert_key_type = 0x%x\n", p_cert_data->cert_key_type);
 
     /*Write Quote*/
-    fptr = fopen("quote.dat","wb");
+    fptr = fopen("/host/quote.dat","wb");
     fwrite(p_quote, quote_size, 1, fptr);
     fclose(fptr);
 
