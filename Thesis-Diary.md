@@ -9,6 +9,7 @@
    3. Guarantees about destroying enclave;
    4. Start thinking about performance.
 
+
 ## 2021-03-19
     1. Trying to set up TLS between server and client;
     2. Configured remote attestation - quote confirmed;
