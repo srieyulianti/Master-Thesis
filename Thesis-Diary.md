@@ -1,3 +1,42 @@
+## 2021-03-26
+    1. Working on generating elements for secure channel establishment between client and enclave
+    2. Full focus on DCAP
+    3. Have a look at cluster attestation in Inclavare;
+
+### Action points until next meeting:
+   1. Configure support for DCAP;
+   2. Finish the set up the enclave+attest+establish secure channel chain;
+   3. Guarantees about destroying enclave;
+   4. Start thinking about performance.
+
+## 2021-03-19
+    1. Trying to set up TLS between server and client;
+    2. Configured remote attestation - quote confirmed;
+    3. Discussion about how to correctly set up a TLS connection between the enclave and the model owner.
+    4. Discussion about Occlum support for DCAP.
+
+### Action points until next meeting:
+    1. Configure support for DCAP;
+    2. Finish the set up the enclave+attest+establish secure channel chain;
+    3. Guarantees about destroying enclave;
+    4. Start thinking about performance.
+
+
+## 2021-03-12
+  1. Good progress - performed remote attestation;
+  2. Next steps: how to integrate remote attestation with TLS
+  3. Next next step: speed to set up the enclave+attest+establish secure channel
+  - how quickly can it be done?
+  What about setup time of other library OSs?
+  4. Other questions: destroying enclaves - how does that happen, is there a
+  way to get any guarantee?
+  5. Potential idea: for the scalability tests, set up a different - bigger virtual machine;
+  6. Later: potentially compare results of "basic" operations (deployment, attestation, etc.)
+  with Inclavare.
+
+### Action points until next meeting:
+
+
 ## 2021-03-05
     1. Discussing the attestation architecture;
     2. Question - What is the attestation key;
@@ -6,7 +45,7 @@
 ### Action points until next meeting:
     1. Continue development as it is;
 
-### Action points until next meeting:
+
 
 
 ## 2021-02-26
