@@ -1,2 +1,0 @@
-DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
-<deliverydir>/build/lib64/libmpa_uefi.so	<installdir>/lib/libmpa_uefi.so	0	main	STP

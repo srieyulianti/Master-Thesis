@@ -1,3 +1,0 @@
-DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
-<deliverydir>/package/installer/common/sgx-ra-service/installConfig	<installdir>/installConfig	0	main	STP
-<deliverydir>/package/installer/common/sgx-ra-service/Makefile	<installdir>/Makefile	0	main	STP
