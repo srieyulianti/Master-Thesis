@@ -25,6 +25,6 @@
 #include "sgx_urts.h"		/* for enclave_id etc. */
 #include "Wolfssl_Enclave_u.h"	/* contains untrusted wrapper functions used to call enclave functions */
 
-//int server_connect(sgx_enclave_id_t id);
+int server_connect(sgx_enclave_id_t id);
 
 #endif /* RA_TLS_SERVER_H */

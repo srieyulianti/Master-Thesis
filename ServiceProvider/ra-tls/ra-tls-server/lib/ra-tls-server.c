@@ -33,38 +33,43 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <netdb.h>
 
 #include <wolfssl/ssl.h>
 #include <wolfssl/certs_test.h>
 
-#define DEFAULT_PORT 11111
+#define SRV_PORT 8081
 
 #define CIPHER_LIST "ECDHE-ECDSA-AES128-GCM-SHA256"
 
-static sgx_enclave_id_t load_enclave(void)
+int server_connect(sgx_enclave_id_t id)
 {
-	sgx_launch_token_t t;
-	memset(t, 0, sizeof(t));
+    int                sgxStatus;
+    int                sockfd;
+    int                connd;
+    struct sockaddr_in servAddr;
+	struct sockaddr_in clientAddr;
+    socklen_t          size = sizeof(clientAddr);
+    struct hostent	   *hostname;
+	struct in_addr	   ip_addr;
+	char               buff[256];
+    size_t             len;
+    int                ret;
+	int 			   sgxStatus;                        /* variable for error checking */
+    
+	hostname = gethostbyname("server");
+	ip_addr = *(struct in_addr *)(hostname->h_addr);
+	//const char*        reply = "I hear ya fa shizzle!\n";
 
-	sgx_enclave_id_t id;
-	int updated = 0;
-	int ret = sgx_create_enclave(ENCLAVE_FILENAME, 1, &t, &updated, &id, NULL);
-	if (ret != SGX_SUCCESS) {
-		fprintf(stderr, "Failed to create Enclave: error %d\n", ret);
+    /* declare wolfSSL objects */
+    long ctx;
+    long ssl;
+    long method;
+
+	/* Initialize wolfSSL */
+	sgxStatus = enc_wolfSSL_Init(id, &ret);
+	if (sgxStatus != SGX_SUCCESS || ret != WOLFSSL_SUCCESS)
 		return -1;
-	}
-
-	return id;
-}
-
-int ra_tls_server_startup(int connd)
-{
-	sgx_enclave_id_t id = load_enclave();
-
-	if (id < 0) {
-		fprintf(stderr, "Failed to load enclave image\n");
-		return -1;
-	}
 
 #ifdef SGX_DEBUG
 	enc_wolfSSL_Debugging_ON(id);
@@ -72,17 +77,21 @@ int ra_tls_server_startup(int connd)
 	enc_wolfSSL_Debugging_OFF(id);
 #endif
 
-	int ret;
-	int sgxStatus;
-	sgxStatus = enc_wolfSSL_Init(id, &ret);
-	if (sgxStatus != SGX_SUCCESS || ret != WOLFSSL_SUCCESS)
-		return -1;
+	/* Create a socket that uses an internet IPv4 address,
+     * Sets the socket to be stream based (TCP),
+     * 0 means choose the default protocol. */
+    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+        fprintf(stderr, "ERROR: failed to create the socket\n");
+        return -1;
+    }
 
+	/* Create and initialize WOLFSSL_CTX */
 	WOLFSSL_METHOD *method;
 	sgxStatus = enc_wolfTLSv1_2_server_method(id, &method);
 	if (sgxStatus != SGX_SUCCESS || !method)
 		return -1;
 
+	
 	WOLFSSL_CTX *ctx;
 	sgxStatus = enc_wolfSSL_CTX_new(id, &ctx, method);
 	if (sgxStatus != SGX_SUCCESS || !ctx)
@@ -90,6 +99,34 @@ int ra_tls_server_startup(int connd)
 
 	sgxStatus = enc_create_key_and_x509(id, ctx);
 	assert(sgxStatus == SGX_SUCCESS);
+
+	/* Initialize the server address struct with zeros */
+    memset(&servAddr, 0, sizeof(servAddr));
+	/* Fill in the server address */
+    servAddr.sin_family      = AF_INET;             /* using IPv4      */
+    servAddr.sin_port        = htons(SRV_PORT); 	/* on DEFAULT_PORT */
+    servAddr.sin_addr.s_addr = inet_ntoa(ip_addr);  /* from anywhere   */
+	
+	/* Bind the server socket to our port */
+    if (bind(sockfd, (struct sockaddr*)&servAddr, sizeof(servAddr)) == -1) {
+        fprintf(stderr, "ERROR: failed to bind\n");
+        return -1;
+    }
+
+    /* Listen for a new connection, allow 5 pending connections */
+    if (listen(sockfd, 5) == -1) {
+        fprintf(stderr, "ERROR: failed to listen\n");
+        return -1;
+    }
+
+    printf("Waiting for a connection...\n");
+
+    /* Accept client connections */
+    if ((connd = accept(sockfd, (struct sockaddr*)&clientAddr, &size))
+        == -1) {
+        fprintf(stderr, "ERROR: failed to accept the connection\n\n");
+        return -1;
+    }
 
 	WOLFSSL *ssl;
 	sgxStatus = enc_wolfSSL_new(id, &ssl, ctx);
@@ -103,19 +140,19 @@ int ra_tls_server_startup(int connd)
 
 	fprintf(stdout, "Client connected successfully\n");
 
-	char buff[256];
-	size_t len;
+	/* Read the client data into our buff array */
 	memset(buff, 0, sizeof(buff));
 	sgxStatus = enc_wolfSSL_read(id, &ret, ssl, buff, sizeof(buff) - 1);
 	if (sgxStatus != SGX_SUCCESS || ret == -1)
 		goto err_ssl;
 
+	/* Print to stdout any data the client sends */
 	fprintf(stdout, "Client: %s\n", buff);
 
 	/* Write our reply into buff */
 	memset(buff, 0, sizeof(buff));
 	memcpy(buff, "I hear ya fa shizzle!\n", sizeof(buff));
-	len = strnlen(buff, sizeof(buff));
+	len = strnlen(buff, sizeof(buff));	
 
 	/* Reply back to the client */
 	sgxStatus = enc_wolfSSL_write(id, &ret, ssl, buff, len);
@@ -123,11 +160,20 @@ int ra_tls_server_startup(int connd)
 		ret = -1;
 
       err_ssl:
+	
+	/* Cleanup after this connection */
 	enc_wolfSSL_free(id, ssl);
       err_ctx:
+	close(connd);
+
+	/* Cleanup and return */
 	sgxStatus = enc_wolfSSL_CTX_free(id, ctx);
       err:
 	sgxStatus = enc_wolfSSL_Cleanup(id, &ret);
-
+	close(sockfd);
 	return ret;
 }
+
+
+
+
