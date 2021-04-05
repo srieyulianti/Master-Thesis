@@ -123,8 +123,8 @@ endif
 
 all: App libra-tls-server.a libsgxsdk-ra-attester_u.a
 
-Wolfssl_Enclave_u.c: $(SGX_EDGER8R) $(TOPDIR)/sgxsdk-enclave/Wolfssl_Enclave.edl
-	@$(SGX_EDGER8R) --untrusted $(TOPDIR)/sgxsdk-enclave/Wolfssl_Enclave.edl --search-path $(TOPDIR)/sgxsdk-enclave --search-path $(SGX_SDK)/include --search-path $(SGX_RA_TLS_ROOT)
+Wolfssl_Enclave_u.c: $(SGX_EDGER8R) $(TOPDIR)/sgxsdk_enclave/Wolfssl_Enclave.edl
+	@$(SGX_EDGER8R) --untrusted $(TOPDIR)/sgxsdk_enclave/Wolfssl_Enclave.edl --search-path $(TOPDIR)/sgxsdk_enclave --search-path $(SGX_SDK)/include --search-path $(SGX_RA_TLS_ROOT)
 	@echo "GEN  =>  $@"
 
 Wolfssl_Enclave_u.o: Wolfssl_Enclave_u.c
