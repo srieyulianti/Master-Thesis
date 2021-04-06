@@ -18,7 +18,7 @@
 #include "ra_private.h"
 
 #if SGX_SDK
-/* SGX SDK does not have this. */
+/* SGX SDK does not have this.. */
 void *memmem(const void *h0, size_t k, const void *n0, size_t l);
 #endif
 

@@ -28,7 +28,7 @@
 #include "ra_private.h"
 
 /**
- * Generate LA-TLS certificate containing local report information.
+ * Generate LA-TLS certificate containing local report information..
  *
  * @param der_crt Caller must allocate memory for certificate.
  * @param der_crt_len On entry contains the size of der_crt buffer. On return holds actual size of certificate in bytes.

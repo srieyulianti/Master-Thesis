@@ -49,7 +49,7 @@ void get_quote_from_cert
 );
 
 /**
- * Verify SGX-related X.509 extensions.
+ * Verify SGX-related X.509 extensions..
  * @return 0 if verification succeeds, 1 otherwise.
  */
 int verify_sgx_cert_extensions

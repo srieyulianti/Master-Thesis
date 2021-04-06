@@ -1,6 +1,6 @@
 # Makefile to build the wolfSSL-based remote attestation TLS library.
 
-######## Intel(R) SGX SDK Settings ########
+######## Intel(R) SGX SDK Settings #########
 SGX_SDK ?= /opt/intel/sgxsdk
 SGX_MODE ?= HW
 SGX_ARCH ?= x64

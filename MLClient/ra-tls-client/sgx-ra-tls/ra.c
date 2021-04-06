@@ -1,4 +1,4 @@
-/* Definitions common to attester and verifier. */
+/* Definitions common to attester and verifier.. */
 
 #include <stdint.h>
 #include <stdlib.h>

@@ -13,4 +13,4 @@ double current_time(void);
 }
 #endif
 
-#endif /* !_BENCHMARK_ENCLAVE_H_ */
+#endif /* !_BENCHMARK_ENCLAVE_H__ */

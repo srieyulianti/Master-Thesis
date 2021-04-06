@@ -12,3 +12,4 @@ void http_get
     struct curl_slist* request_headers,
     char* request_body
 );
+/* end */

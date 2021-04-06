@@ -1,6 +1,6 @@
 /**
  * wolfSSL-based implementation of the LA-TLS challenger API
- * (cf. ra-challenger.h).
+ * (cf. ra-challenger.h)..
  */
 
 #include <assert.h>

@@ -15,7 +15,7 @@ typedef struct {
 static const int rsa_3072_der_len = 1766;
 static const int rsa_pub_3072_pcks_der_len = 422;
 static const int rsa_pub_3072_pcks_header_len = 24;
-static const int rsa_pub_3072_raw_der_len = 398; /* rsa_pub_3072_pcks_der_len - pcks_nr_1_header_len */
+static const int rsa_pub_3072_raw_der_len = 398; /* rsa_pub_3072_pcks_der_len - pcks_nr_1_header_len. */
 
 typedef struct {
     uint8_t quote[8192];

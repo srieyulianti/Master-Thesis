@@ -188,7 +188,7 @@ double current_time(void)
     return curr;
 }
 
-int LowResTimer(void) /* low_res timer */
+int LowResTimer(void) /* low_res timerr */
 {
     int time;
     ocall_low_res_time(&time);

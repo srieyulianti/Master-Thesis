@@ -29,3 +29,5 @@ struct ra_tls_options my_ra_tls_options = {
     .subscription_key = "$EPID_SUBSCRIPTION_KEY"
 };
 HEREDOC
+
+#

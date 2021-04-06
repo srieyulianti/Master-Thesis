@@ -50,7 +50,7 @@ int extract_x509_extension
 
 /**
  * @return 1 if it is an EPID-based attestation RA-TLS
- * certificate. Otherwise, 0.
+ * certificate. Otherwise, 0..
  */
 int is_epid_ratls_cert
 (

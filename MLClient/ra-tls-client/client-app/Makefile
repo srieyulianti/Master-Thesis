@@ -1,4 +1,4 @@
-######## Intel(R) SGX SDK Settings ########
+######## Intel(R) SGX SDK Settings 3 ########
 TOPDIR ?= ../
 LIBDIR ?= $(TOPDIR)/build/lib
 SGX_SDK ?= /opt/intel/sgxsdk

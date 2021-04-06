@@ -1,4 +1,4 @@
-######## Intel(R) SGX SDK Settings ########
+######## Intel(R) SGX SDK Settings #########
 TOPDIR ?= ../
 SGX_SDK ?= /opt/intel/sgxsdk
 SGX_MODE ?= HW

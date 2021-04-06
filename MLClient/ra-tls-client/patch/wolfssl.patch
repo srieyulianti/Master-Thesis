@@ -19,7 +19,7 @@ index 41ff666f2..1767078e2 100644
 --- a/IDE/LINUX-SGX/sgx_t_static.mk
 +++ b/IDE/LINUX-SGX/sgx_t_static.mk
 @@ -1,6 +1,7 @@
- ######## Intel(R) SGX SDK Settings ########
+ ######## Intel(R) SGX SDK Settings #########
  SGX_SDK ?= /opt/intel/sgxsdk
  SGX_MODE ?= SIM
 +SGX_DEBUG ?= 1

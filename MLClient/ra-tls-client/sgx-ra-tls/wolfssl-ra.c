@@ -13,7 +13,7 @@ void sha256_rsa_pubkey
     RsaKey* key
 )
 {
-    // Expect a 3072 bit RSA key.
+    // Expect a 3072 bit RSA key..
     assert(key->n.used == 48 /* == 3072 / 8 / 8 */);
 
     uint8_t buf[1024];
