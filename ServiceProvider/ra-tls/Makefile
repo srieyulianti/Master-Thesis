@@ -38,9 +38,9 @@ CC ?= gcc
 export DEBUG PREFIX BINDIR LIBDIR INCDIR SGX_SDK SGX_RA_TLS WOLFSSL CC
 
 deps := $(LIBDIR)/libwolfssl.a $(LIBDIR)/libwolfssl.sgx.static.lib.a $(LIBDIR)/libsgx_ra_tls_wolfssl.a $(LIBDIR)/libcurl-wolfssl.a
-all: $(deps) $(BINDIR)/ra-tls-server $(BINDIR)/Wolfssl_Enclave.signed.so
+all: $(deps) $(BINDIR)/App $(BINDIR)/Wolfssl_Enclave.signed.so
 
-$(BINDIR)/ra-tls-server: $(BINDIR) $(LIBDIR)/libcurl-wolfssl.a $(LIBDIR)/libwolfssl.a
+$(BINDIR)/App: $(BINDIR) $(LIBDIR)/libcurl-wolfssl.a $(LIBDIR)/libwolfssl.a
 	make -C $(RA_TLS_SERVER)
 	cp -f $(RA_TLS_SERVER)/libsgxsdk-ra-attester_u.a $(LIBDIR)/
 	cp -f $(RA_TLS_SERVER)/App $@

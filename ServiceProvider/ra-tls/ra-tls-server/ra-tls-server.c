@@ -44,46 +44,40 @@
 
 int server_connect(sgx_enclave_id_t id)
 {
-    int                sgxStatus;
-    int                sockfd;
-    int                connd;
-    struct sockaddr_in servAddr;
+	int                sgxStatus;
+	int                sockfd;
+	int                connd;
+	struct sockaddr_in servAddr;
 	struct sockaddr_in clientAddr;
-    socklen_t          size = sizeof(clientAddr);
-    struct hostent	   *hostname;
+	socklen_t          size = sizeof(clientAddr);
+	struct hostent	   *hostname;
 	struct in_addr	   ip_addr;
 	char               buff[256];
-    size_t             len;
-    int                ret;
-	int 			   sgxStatus;                        /* variable for error checking */
+	size_t             len;
+	int                ret; /* variable for error checking */
+	
     
 	hostname = gethostbyname("server");
 	ip_addr = *(struct in_addr *)(hostname->h_addr);
-	//const char*        reply = "I hear ya fa shizzle!\n";
-
-    /* declare wolfSSL objects */
-    long ctx;
-    long ssl;
-    long method;
-
-	/* Initialize wolfSSL */
-	sgxStatus = enc_wolfSSL_Init(id, &ret);
-	if (sgxStatus != SGX_SUCCESS || ret != WOLFSSL_SUCCESS)
-		return -1;
-
+	
 #ifdef SGX_DEBUG
 	enc_wolfSSL_Debugging_ON(id);
 #else
 	enc_wolfSSL_Debugging_OFF(id);
 #endif
 
+	/* Initialize wolfSSL */
+	sgxStatus = enc_wolfSSL_Init(id, &ret);
+	if (sgxStatus != SGX_SUCCESS || ret != WOLFSSL_SUCCESS)
+		return -1;
+
 	/* Create a socket that uses an internet IPv4 address,
-     * Sets the socket to be stream based (TCP),
-     * 0 means choose the default protocol. */
-    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        fprintf(stderr, "ERROR: failed to create the socket\n");
-        return -1;
-    }
+     	* Sets the socket to be stream based (TCP),
+     	* 0 means choose the default protocol. */
+	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+        	fprintf(stderr, "ERROR: failed to create the socket\n");
+        	return -1;
+	}
 
 	/* Create and initialize WOLFSSL_CTX */
 	WOLFSSL_METHOD *method;
@@ -101,32 +95,32 @@ int server_connect(sgx_enclave_id_t id)
 	assert(sgxStatus == SGX_SUCCESS);
 
 	/* Initialize the server address struct with zeros */
-    memset(&servAddr, 0, sizeof(servAddr));
+	memset(&servAddr, 0, sizeof(servAddr));
+	
 	/* Fill in the server address */
-    servAddr.sin_family      = AF_INET;             /* using IPv4      */
-    servAddr.sin_port        = htons(SRV_PORT); 	/* on DEFAULT_PORT */
-    servAddr.sin_addr.s_addr = inet_ntoa(ip_addr);  /* from anywhere   */
+	servAddr.sin_family      = AF_INET;             /* using IPv4      */
+	servAddr.sin_port        = htons(SRV_PORT); 	/* on DEFAULT_PORT */
+	servAddr.sin_addr.s_addr = INADDR_ANY;  /* from anywhere   */
 	
 	/* Bind the server socket to our port */
-    if (bind(sockfd, (struct sockaddr*)&servAddr, sizeof(servAddr)) == -1) {
-        fprintf(stderr, "ERROR: failed to bind\n");
-        return -1;
-    }
+       	if (bind(sockfd, (struct sockaddr*)&servAddr, sizeof(servAddr)) == -1) {
+        	fprintf(stderr, "ERROR: failed to bind\n");
+        	return -1;
+    	}
 
-    /* Listen for a new connection, allow 5 pending connections */
-    if (listen(sockfd, 5) == -1) {
-        fprintf(stderr, "ERROR: failed to listen\n");
-        return -1;
-    }
+    	/* Listen for a new connection, allow 5 pending connections */
+	if (listen(sockfd, 5) == -1) {
+        	fprintf(stderr, "ERROR: failed to listen\n");
+        	return -1;
+	}
 
-    printf("Waiting for a connection...\n");
+    	printf("[+] Waiting for a connection...\n");
 
-    /* Accept client connections */
-    if ((connd = accept(sockfd, (struct sockaddr*)&clientAddr, &size))
-        == -1) {
-        fprintf(stderr, "ERROR: failed to accept the connection\n\n");
-        return -1;
-    }
+    	/* Accept client connections */
+    	if ((connd = accept(sockfd, (struct sockaddr*)&clientAddr, &size)) == -1) {
+        	fprintf(stderr, "ERROR: failed to accept the connection\n\n");
+        	return -1;
+    	}
 
 	WOLFSSL *ssl;
 	sgxStatus = enc_wolfSSL_new(id, &ssl, ctx);
@@ -159,18 +153,17 @@ int server_connect(sgx_enclave_id_t id)
 	if (sgxStatus != SGX_SUCCESS || ret != len)
 		ret = -1;
 
-      err_ssl:
-	
-	/* Cleanup after this connection */
-	enc_wolfSSL_free(id, ssl);
-      err_ctx:
-	close(connd);
+	err_ssl:
+		/* Cleanup after this connection */
+		enc_wolfSSL_free(id, ssl);
+	err_ctx:
+		/* Cleanup and return */
+		sgxStatus = enc_wolfSSL_CTX_free(id, ctx);
+		close(connd);
+	err:
+		sgxStatus = enc_wolfSSL_Cleanup(id, &ret);
+		close(sockfd);
 
-	/* Cleanup and return */
-	sgxStatus = enc_wolfSSL_CTX_free(id, ctx);
-      err:
-	sgxStatus = enc_wolfSSL_Cleanup(id, &ret);
-	close(sockfd);
 	return ret;
 }
 

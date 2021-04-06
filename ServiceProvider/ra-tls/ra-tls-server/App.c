@@ -21,14 +21,13 @@
 
 #include "stdafx.h"
 #include "App.h"		/* contains include of Enclave_u.h which has wolfSSL header files */
-//#include "client-tls.h"
 #include "ra-tls-server.h"
 
 
 typedef struct func_args {
-    int    argc;
-    char** argv;
-    int    return_code;
+	int    argc;
+	char** argv;
+	int    return_code;
 } func_args;
 
 int main(int argc, char* argv[]) 
@@ -39,36 +38,33 @@ int main(int argc, char* argv[])
 	int ret = 0;
 	int sgxStatus = 0;
 	int updated = 0;
-    func_args args = { 0 };
+	func_args args = { 0 };
 
 	/* only print off if no command line arguments were passed in */
 	if (argc != 2 || strlen(argv[1]) != 2) {
 		printf("Usage:\n"
-               "\t-s Run a TLS server in enclave\n"
-               );
-        return 0;
+			"\t-s Run a TLS server in enclave\n");
+        	return 0;
 	}
-
-    memset(t, 0, sizeof(sgx_launch_token_t));
-    memset(&args,0,sizeof(args));
-
+	memset(t, 0, sizeof(sgx_launch_token_t));
+	memset(&args,0,sizeof(args));
+	
 	ret = sgx_create_enclave(ENCLAVE_FILENAME, 1, &t, &updated, &id, NULL);
 	if (ret != SGX_SUCCESS) {
 		printf("Failed to create Enclave : error %d - %#x.\n", ret, ret);
 		return 1;
 	}
-
-
-    switch(argv[1][1]) {
-        case 's':
-            printf("Server Test:\n");
-            server_connect(id);
-            break;
+	
+	switch(argv[1][1]) {
+		case 's':
+			printf("[+] Server Test:\n");
+			server_connect(id);
+			break;
 		
 		case '0':
-			printf("Undefined character");
+			printf("[0] Undefined character");
 			break;
-    }
+	}
 
     return 0;
 }

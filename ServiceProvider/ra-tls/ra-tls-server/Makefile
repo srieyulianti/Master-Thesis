@@ -53,11 +53,11 @@ endif
 
 ######## App Settings ########
 
-ifneq ($(SGX_MODE), HW)
-	Urts_Library_Name := sgx_urts_sim
-else
-	Urts_Library_Name := sgx_urts
-endif
+
+DCAP_Library_Name := sgx_dcap_ql
+Urts_Library_Name := sgx_urts
+Uae_Library_Name := sgx_quote_ex
+
 
 Wolfssl_C_Extra_Flags := -DWOLFSSL_SGX -DUSE_WOLFSSL
 ifdef ECDSA
@@ -101,13 +101,8 @@ else
         App_C_Flags += -DNDEBUG -UEDEBUG -UDEBUG
 endif
 
-App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread
+App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -l$(DCAP_Library_Name) -l$(Uae_Library_Name) -lpthread -lsgx_uae_service -ldl
 
-ifneq ($(SGX_MODE), HW)
-	App_Link_Flags += -lsgx_uae_service_sim
-else
-	App_Link_Flags += -lsgx_uae_service
-endif
 
 App_C_Objects := $(App_C_Files:.c=.o)
 
@@ -121,7 +116,7 @@ endif
 
 .PHONY: all
 
-all: App libra-tls-server.a libsgxsdk-ra-attester_u.a
+all: libra-tls-server.a libsgxsdk-ra-attester_u.a App
 
 Wolfssl_Enclave_u.c: $(SGX_EDGER8R) $(TOPDIR)/sgxsdk_enclave/Wolfssl_Enclave.edl
 	@$(SGX_EDGER8R) --untrusted $(TOPDIR)/sgxsdk_enclave/Wolfssl_Enclave.edl --search-path $(TOPDIR)/sgxsdk_enclave --search-path $(SGX_SDK)/include --search-path $(SGX_RA_TLS_ROOT)
@@ -137,10 +132,6 @@ Wolfssl_Enclave_u.o: Wolfssl_Enclave_u.c
 	@$(CC) $(App_C_Flags) -c $< -o $@
 	@echo "CC  <=  $<"
 
-App: Wolfssl_Enclave_u.o $(App_C_Objects)
-	@$(CC) $^ -o $@ $(App_Link_Flags)
-	@echo "LINK => $@"
-
 libra-tls-server.a: Wolfssl_Enclave_u.o $(App_C_Objects) $(LIBDIR)/libcurl-wolfssl.a $(LIBDIR)/libwolfssl.a
 	$(AR) rcs $@ $^
 	@echo "LINK =>  $@"
@@ -148,6 +139,11 @@ libra-tls-server.a: Wolfssl_Enclave_u.o $(App_C_Objects) $(LIBDIR)/libcurl-wolfs
 libsgxsdk-ra-attester_u.a: sgxsdk-ra-attester_u.o
 	$(AR) rcs $@ $^
 	@echo "LINK =>  $@"
+
+App: libra-tls-server.a libsgxsdk-ra-attester_u.a
+	@$(CC) $^ -o $@ $(App_Link_Flags)
+	@echo "LINK => $@"
+
 
 .PHONY: clean
 
