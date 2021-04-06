@@ -1,6 +1,7 @@
 ######## Intel(R) SGX SDK Settings ########
 TOPDIR ?= ../../
 LIBDIR ?= $(TOPDIR)/build/lib
+BINDIR ?= $(TOPDIR)/build/bin
 SGX_SDK ?= /opt/intel/sgxsdk
 SGX_MODE ?= HW
 SGX_DEBUG ?= 1
@@ -140,6 +141,7 @@ Wolfssl_Enclave_u.o: Wolfssl_Enclave_u.c
 App: Wolfssl_Enclave_u.o $(App_C_Objects)
 	@$(CC) $^ -o $@ $(App_Link_Flags)
 	@echo "LINK => $@"
+	cp -f $@ $(BINDIR)/
 
 libra-tls-server.a: Wolfssl_Enclave_u.o $(App_C_Objects) $(LIBDIR)/libcurl-wolfssl.a $(LIBDIR)/libwolfssl.a
 	$(AR) rcs $@ $^
