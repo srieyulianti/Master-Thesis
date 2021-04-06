@@ -62,7 +62,6 @@ endif
 Wolfssl_C_Files := \
 	wolfssl-ra-attester.c \
 	sgxsdk-ra-attester_t.c \
-	ra-challenger.c \
 	wolfssl-ra.c \
 	ra_tls_t.c
 

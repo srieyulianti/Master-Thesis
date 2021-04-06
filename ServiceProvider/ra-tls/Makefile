@@ -12,7 +12,6 @@ INCDIR := $(PREFIX)/include
 SGX_SDK ?= /opt/intel/sgxsdk
 SGX_RA_TLS := $(TOPDIR)/sgx-ra-tls
 WOLFSSL := $(TOPDIR)/wolfssl
-ELV := $(TOPDIR)/elv
 RA_TLS_SERVER := $(TOPDIR)/ra-tls-server
 
 ifdef ECDSA
@@ -38,26 +37,17 @@ CC ?= gcc
 
 export DEBUG PREFIX BINDIR LIBDIR INCDIR SGX_SDK SGX_RA_TLS WOLFSSL CC
 
-deps := $(LIBDIR)/libwolfssl.a $(LIBDIR)/libwolfssl.sgx.static.lib.a $(LIBDIR)/libsgx_ra_tls_wolfssl.a $(LIBDIR)/libcurl-wolfssl.a $(LIBDIR)/liberpal-stub.a
-all: $(deps) $(BINDIR)/elv $(BINDIR)/ra-tls-server $(BINDIR)/Wolfssl_Enclave.signed.so
-ifdef LA
-$(BINDIR)/elv: $(BINDIR) $(LIBDIR)/libra-challenger.a $(LIBDIR)/libwolfssl.a $(LIBDIR)/liberpal-stub.a
-	make -C $(ELV) LA=1
-else
-$(BINDIR)/elv: $(BINDIR) $(LIBDIR)/libra-challenger.a $(LIBDIR)/libwolfssl.a
-	make -C $(ELV)
-endif
-	cp -f $(ELV)/libra-tls-client.a $(LIBDIR)/libra-tls-client.a
-	cp -f $(ELV)/elv $@
+deps := $(LIBDIR)/libwolfssl.a $(LIBDIR)/libwolfssl.sgx.static.lib.a $(LIBDIR)/libsgx_ra_tls_wolfssl.a $(LIBDIR)/libcurl-wolfssl.a
+all: $(deps) $(BINDIR)/ra-tls-server $(BINDIR)/Wolfssl_Enclave.signed.so
 
 $(BINDIR)/ra-tls-server: $(BINDIR) $(LIBDIR)/libcurl-wolfssl.a $(LIBDIR)/libwolfssl.a
 	make -C $(RA_TLS_SERVER)
-	cp -f $(RA_TLS_SERVER)/lib/libsgxsdk-ra-attester_u.a $(LIBDIR)/
-	cp -f $(RA_TLS_SERVER)/ra-tls-server $@
+	cp -f $(RA_TLS_SERVER)/libsgxsdk-ra-attester_u.a $(LIBDIR)/
+	cp -f $(RA_TLS_SERVER)/App $@
 
 $(BINDIR)/Wolfssl_Enclave.signed.so: $(BINDIR)
-	$(MAKE) -C stub-enclave && \
-	cp -f stub-enclave/Wolfssl_Enclave.signed.so "$@"
+	$(MAKE) -C sgxsdk_enclave && \
+	cp -f sgxsdk_enclave/Wolfssl_Enclave.signed.so "$@"
 
 # Add --enable-debug to ./configure for debug build
 # WOLFSSL_ALWAYS_VERIFY_CB: Always call certificate verification callback, even if verification succeeds
@@ -84,21 +74,6 @@ wolfssl:
 	fi
 	cd wolfssl && ./autogen.sh && \
 	  CFLAGS="$(CFLAGS)" ./configure $(WOLFSSL_CONFIGURE_FLAGS)
-
-$(SGX_RA_TLS)/wolfssl-ra-challenger.o: $(SGX_RA_TLS)/wolfssl-ra-challenger.c
-	@echo $(CC) $(CFLAGS) -c $< -o $@
-	@$(CC) $(CFLAGS) -c $< -o $@
-	@echo "CC   <=  $<"
-
-ifdef LA
-# sgx-ra-tls needs the header files from wolfssl.
-$(LIBDIR)/libra-challenger.a: $(LIBDIR) $(LIBDIR)/libwolfssl.a $(SGX_RA_TLS)/ra.o $(SGX_RA_TLS)/wolfssl-ra-challenger.o $(SGX_RA_TLS)/wolfssl-ra.o $(SGX_RA_TLS)/ra-challenger.o $(SGX_RA_TLS)/ias_sign_ca_cert.o $(SGX_RA_TLS)/wolfssl-la-challenger.o pal/Wolfssl_Enclave_u.o pal/App.o
-	$(AR) rcs "$@" $(filter %.o, $^)
-else
-# sgx-ra-tls needs the header files from wolfssl.
-$(LIBDIR)/libra-challenger.a: $(LIBDIR) $(LIBDIR)/libwolfssl.a $(SGX_RA_TLS)/ra.o $(SGX_RA_TLS)/wolfssl-ra-challenger.o $(SGX_RA_TLS)/wolfssl-ra.o $(SGX_RA_TLS)/ra-challenger.o $(SGX_RA_TLS)/ias_sign_ca_cert.o pal/Wolfssl_Enclave_u.o pal/App.o
-	$(AR) rcs "$@" $(filter %.o, $^)
-endif
 
 # Ideally, libwolfssl.sgx.static.lib.a and libwolfssl.a could be built
 # in parallel. Does not work however. Hence, the dependency forces a
@@ -129,9 +104,6 @@ $(LIBDIR)/libcurl-wolfssl.a: $(LIBDIR) curl-wolfssl $(LIBDIR)/libwolfssl.a
 	cd curl-wolfssl && $(MAKE) && \
 	  cp -f lib/.libs/libcurl.a "$@"
 
-$(LIBDIR)/liberpal-stub.a:
-	$(MAKE) -C pal && \
-	mv -f pal/liberpal-stub.a "$@"
 
 CURL_CONFFLAGS := --prefix=$(shell readlink -f $(PREFIX)) --without-libidn --without-librtmp --without-libssh2 --without-libmetalink --without-libpsl --disable-ldap --disable-ldaps --disable-shared
 ifdef DEBUG
@@ -157,11 +129,9 @@ clean:
 	rm -rf $(PREFIX)
 	[ -d curl-wolfssl ] && $(MAKE) clean -C curl-wolfssl || true
 	[ -d wolfssl ] && $(MAKE) clean -C wolfssl || true
-	$(MAKE) -C stub-enclave clean
+	$(MAKE) -C sgxsdk_enclave clean
 	$(MAKE) -C $(SGX_RA_TLS) clean
-	$(MAKE) -C $(ELV) clean
 	$(MAKE) -C $(RA_TLS_SERVER) clean
-	$(MAKE) -C pal clean
 	rm -f wolfssl/IDE/LINUX-SGX/libwolfssl.sgx.static.lib.a
 
 mrproper:
