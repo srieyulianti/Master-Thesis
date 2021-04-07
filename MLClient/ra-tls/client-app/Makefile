@@ -134,7 +134,7 @@ Wolfssl_Enclave_u.o: Wolfssl_Enclave_u.c
 	@$(CC) $(App_C_Flags) -c $< -o $@
 	@echo "CC  <=  $<"
 
-libra-tls-client.a: Wolfssl_Enclave_u.o $(App_C_Objects) $(LIBDIR)/libcurl-wolfssl.a $(LIBDIR)/libwolfssl.a
+libra-tls-client.a: Wolfssl_Enclave_u.o $(App_C_Objects) $(LIBDIR)/libcurl-wolfssl.a $(LIBDIR)/libwolfssl.a $(LIBDIR)/libra-challenger.a
 	$(AR) rcs $@ $^
 	@echo "LINK =>  $@"
 
