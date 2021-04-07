@@ -127,6 +127,8 @@ curl-wolfssl:
 	cd curl-wolfssl && ./buildconf && \
 	  CFLAGS="-fPIC" ./configure $(CURL_CONFFLAGS) --without-ssl --with-cyassl=$(shell readlink -f $(PREFIX))
 
+$(LIBDIR)/libra-attester.a: wolfssl wolfssl-ra-attester.o wolfssl-ra.o 
+	$(AR) rcs $@ $(filter %.o, $^)
 
 $(BINDIR):
 	mkdir -p "$(BINDIR)"

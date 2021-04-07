@@ -55,6 +55,8 @@ endif
 ######## App Settings ########
 
 Urts_Library_Name := sgx_urts
+DCAP_Library_Name := sgx_dcap_ql
+Uae_Library_Name := sgx_quote_ex
 
 
 Wolfssl_C_Extra_Flags := -DWOLFSSL_SGX -DUSE_WOLFSSL
@@ -96,7 +98,7 @@ else
         App_C_Flags += -DNDEBUG -UEDEBUG -UDEBUG
 endif
 
-App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lsgx_dcap_quoteverify -lpthread -lsgx_uae_service -ldl
+App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -l$(DCAP_Library_Name) -l$(Uae_Library_Name) -lsgx_dcap_quoteverify -lpthread -lsgx_uae_service -ldl
 
 App_C_Objects := $(App_C_Files:.c=.o)
 

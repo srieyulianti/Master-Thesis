@@ -60,6 +60,7 @@ ifdef LA
 endif
 
 Wolfssl_C_Files := \
+	wolfssl-ra-attester.c \
 	ra-challenger.c \
 	wolfssl-ra.c \
 	ra_tls_t.c

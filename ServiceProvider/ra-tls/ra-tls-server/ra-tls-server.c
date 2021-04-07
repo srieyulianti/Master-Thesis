@@ -103,24 +103,24 @@ int server_connect(sgx_enclave_id_t id)
 	servAddr.sin_addr.s_addr = INADDR_ANY;  /* from anywhere   */
 	
 	/* Bind the server socket to our port */
-       	if (bind(sockfd, (struct sockaddr*)&servAddr, sizeof(servAddr)) == -1) {
-        	fprintf(stderr, "ERROR: failed to bind\n");
-        	return -1;
-    	}
+    if (bind(sockfd, (struct sockaddr*)&servAddr, sizeof(servAddr)) == -1) {
+       	fprintf(stderr, "ERROR: failed to bind\n");
+       	return -1;
+    }
 
-    	/* Listen for a new connection, allow 5 pending connections */
+    /* Listen for a new connection, allow 5 pending connections */
 	if (listen(sockfd, 5) == -1) {
-        	fprintf(stderr, "ERROR: failed to listen\n");
-        	return -1;
+        fprintf(stderr, "ERROR: failed to listen\n");
+        return -1;
 	}
 
-    	printf("[+] Waiting for a connection...\n");
+    printf("[+] Waiting for a connection...\n");
 
-    	/* Accept client connections */
-    	if ((connd = accept(sockfd, (struct sockaddr*)&clientAddr, &size)) == -1) {
-        	fprintf(stderr, "ERROR: failed to accept the connection\n\n");
-        	return -1;
-    	}
+    /* Accept client connections */
+    if ((connd = accept(sockfd, (struct sockaddr*)&clientAddr, &size)) == -1) {
+       	fprintf(stderr, "ERROR: failed to accept the connection\n\n");
+       	return -1;
+    }
 
 	WOLFSSL *ssl;
 	sgxStatus = enc_wolfSSL_new(id, &ssl, ctx);

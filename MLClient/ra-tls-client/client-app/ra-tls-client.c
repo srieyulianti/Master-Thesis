@@ -114,6 +114,8 @@ int client_connect(sgx_enclave_id_t id)
         return EXIT_FAILURE;
     }
 
+	printf("[+] Connection with server has been established\n");
+
     enc_wolfSSL_Debugging_ON(id);
     enc_wolfSSL_Init(id, &sgxStatus);
 
@@ -172,7 +174,7 @@ int client_connect(sgx_enclave_id_t id)
 	ecdsa_get_quote_from_dcap_cert(der, derSz, (sgx_quote3_t*)quote_buff);
 	sgx_quote3_t* quote = (sgx_quote3_t*)quote_buff;
 	body = &quote->report_body;
-	printf("ECDSA verification\n");
+	printf("[+] ECDSA verification\n");
 #elif defined LA_REPORT
     sgx_report_t report = {0,};
     la_get_report_from_cert(der, derSz, &report);
@@ -186,7 +188,7 @@ int client_connect(sgx_enclave_id_t id)
 	printf("EPID verification\n");
 #endif
 
-    printf("Server's SGX identity:\n");
+    printf("[+] Server's SGX identity:\n");
 	printf("  . MRENCLAVE = ");
 	for (int i = 0; i < SGX_HASH_SIZE; ++i)
 		printf("%02x", body->mr_enclave.m[i]);
