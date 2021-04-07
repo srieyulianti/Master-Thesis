@@ -82,97 +82,89 @@ extern struct ra_tls_options my_ra_tls_options;
 
 int client_connect(sgx_enclave_id_t id)
 {
-	int     		sgxStatus;                  
-	int     		sockfd;                     /* socket file descriptor */
-	struct  sockaddr_in 	servAddr;       /* struct for server address */
+	int     			sgxStatus;                  
+	int     			sockfd;                     /* socket file descriptor */
+	struct  sockaddr_in servAddr;       /* struct for server address */
 	struct 	hostent		*hostname;
 	struct	in_addr		ip_addr;
-	int     		ret = 0;                    /* variable for error checking */
+	int     			ret;                    /* variable for error checking */
 	
 	/* data to send to the server, data recieved from the server */
 	char    sendBuff[] = "Hello Server!";
 	char    rcvBuff[MAXDATASIZE] = {0};
 
     	/* internet address family, stream based tcp, default protocol */
-    	hostname = gethostbyname("server");
+    hostname = gethostbyname("server");
 	ip_addr = *(struct in_addr *)(hostname->h_addr);
-    	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-    	if (sockfd < 0) {
-        	printf("Failed to create socket. errno: %i\n", errno);
-        	return EXIT_FAILURE;
-   	 }
+    if (sockfd < 0) {
+       	printf("Failed to create socket. errno: %i\n", errno);
+       	return EXIT_FAILURE;
+   	}
 
-    	memset(&servAddr, 0, sizeof(servAddr)); /* clears memory block for use */
-    	servAddr.sin_family = AF_INET;          /* sets addressfamily to internet*/
-    	servAddr.sin_port = htons(SERV_PORT);   /* sets port to defined port */
+    memset(&servAddr, 0, sizeof(servAddr)); /* clears memory block for use */
+    servAddr.sin_family = AF_INET;          /* sets addressfamily to internet*/
+    servAddr.sin_port = htons(SERV_PORT);   /* sets port to defined port */
 
-    	/* looks for the server at the entered address (ip in the command line) */
-    	if (inet_pton(AF_INET, inet_ntoa(ip_addr), &servAddr.sin_addr) < 1) {
-        	/* checks validity of address */
-        	ret = errno;
-        	printf("Invalid Address. errno: %i\n", ret);
-        	return EXIT_FAILURE;
-   	 }
+    /* looks for the server at the entered address (ip in the command line) */
+    if (inet_pton(AF_INET, inet_ntoa(ip_addr), &servAddr.sin_addr) < 1) {
+       	/* checks validity of address */
+       	ret = errno;
+       	printf("Invalid Address. errno: %i\n", ret);
+       	return EXIT_FAILURE;
+   	}
 
-    	if (connect(sockfd, (struct sockaddr *) &servAddr, sizeof(servAddr)) < 0) {
-        	ret = errno;
-        	printf("Connect error. Error: %i\n", ret);
-        	return EXIT_FAILURE;
-    	}
+    if (connect(sockfd, (struct sockaddr *) &servAddr, sizeof(servAddr)) < 0) {
+       	ret = errno;
+       	printf("Connect error. Error: %i\n", ret);
+       	return EXIT_FAILURE;
+    }
 
 	printf("[+] Connection with server has been established\n");
 
-    	enc_wolfSSL_Debugging_ON(id);
-    	enc_wolfSSL_Init(id, &sgxStatus);
-
-    	WOLFSSL_CTX *ctx = wolfSSL_CTX_new(wolfTLSv1_2_client_method());
-	if (!ctx) {
+    enc_wolfSSL_Debugging_ON(id);
+    
+	/* Initialize wolfSSL */
+	sgxStatus = enc_wolfSSL_Init(id, &ret);
+	if (sgxStatus != SGX_SUCCESS || ret != WOLFSSL_SUCCESS)
+		return -1;
+		
+    /* Create and initialize WOLFSSL_CTX */
+	WOLFSSL_METHOD *method;
+	sgxStatus = enc_wolfTLSv1_2_client_method(id, &method);
+	if (sgxStatus != SGX_SUCCESS || !method)
+		return -1;
+	
+	WOLFSSL_CTX *ctx;
+	sgxStatus = enc_wolfSSL_CTX_new(id, &ctx, method);
+	if (sgxStatus != SGX_SUCCESS || !ctx){
 		fprintf(stderr, "ERROR: failed to create WOLFSSL_CTX\n");
 		goto err;
 	}
 
-#ifdef SGX_RATLS_MUTUAL
-	uint8_t key[2048];
-	uint8_t crt[8192];
-	int key_len = sizeof(key);
-	int crt_len = sizeof(crt);
+	sgxStatus = enc_create_key_and_x509(id, ctx);
+	assert(sgxStatus == SGX_SUCCESS);
 
-#ifdef RATLS_ECDSA
-	ecdsa_create_key_and_x509(key, &key_len, crt, &crt_len);
-#else
-	create_key_and_x509(key, &key_len, crt, &crt_len, &my_ra_tls_options);
-#endif
+    wolfSSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, cert_verify_callback);
 
-    	int ret = wolfSSL_CTX_use_PrivateKey_buffer(ctx, key, key_len,
-						    SSL_FILETYPE_ASN1);
-	assert(SSL_SUCCESS == ret);
-
-	ret = wolfSSL_CTX_use_certificate_buffer(ctx, crt, crt_len,
-						 SSL_FILETYPE_ASN1);
-	assert(SSL_SUCCESS == ret);
-
-#endif
-
-    	wolfSSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, cert_verify_callback);
-
-	WOLFSSL *ssl = wolfSSL_new(ctx);
-	if (!ssl) {
+	WOLFSSL *ssl;
+	sgxStatus = enc_wolfSSL_new(id, &ssl, ctx);
+	if (sgxStatus != SGX_SUCCESS || !ssl){
 		fprintf(stderr, "ERROR: failed to create WOLFSSL object\n");
 		goto err_ctx;
 	}
-
-    	/* Attach wolfSSL to the socket */
-	wolfSSL_set_fd(ssl, sockfd);
-
-    	if (wolfSSL_connect(ssl) != SSL_SUCCESS) {
+	
+	/* Attach wolfSSL to the socket */
+	sgxStatus = enc_wolfSSL_set_fd(id, &ret, ssl, connd);
+	if (sgxStatus != SGX_SUCCESS || ret != SSL_SUCCESS){
 		fprintf(stderr, "ERROR: failed to connect to wolfSSL\n");
 		goto err_ssl;
 	}
+		
+    WOLFSSL_X509 *srvcrt = wolfSSL_get_peer_certificate(ssl);
 
-    	WOLFSSL_X509 *srvcrt = wolfSSL_get_peer_certificate(ssl);
-
-    	int derSz;
+    int derSz;
 	const unsigned char *der = wolfSSL_X509_get_der(srvcrt, &derSz);
 	sgx_report_body_t *body = NULL;
 
@@ -182,11 +174,13 @@ int client_connect(sgx_enclave_id_t id)
 	sgx_quote3_t* quote = (sgx_quote3_t*)quote_buff;
 	body = &quote->report_body;
 	printf("[+] ECDSA verification\n");
+
 #elif defined LA_REPORT
-    	sgx_report_t report = {0,};
-    	la_get_report_from_cert(der, derSz, &report);
-    	body = &report.body;
-    	printf("Local report verification\n");
+    sgx_report_t report = {0,};
+    la_get_report_from_cert(der, derSz, &report);
+    body = &report.body;
+    printf("Local report verification\n");
+
 #else
 	uint8_t quote_buff[8192] = {0,};
 	get_quote_from_cert(der, derSz, (sgx_quote_t*)quote_buff);
@@ -195,7 +189,7 @@ int client_connect(sgx_enclave_id_t id)
 	printf("EPID verification\n");
 #endif
 
-    	printf("[+] Server's SGX identity:\n");
+    printf("[+] Server's SGX identity:\n");
 	printf("  . MRENCLAVE = ");
 	for (int i = 0; i < SGX_HASH_SIZE; ++i)
 		printf("%02x", body->mr_enclave.m[i]);
@@ -205,23 +199,23 @@ int client_connect(sgx_enclave_id_t id)
 		printf("%02x", body->mr_signer.m[i]);
 	printf("\n");
 
-    	if (wolfSSL_write(ssl, sendBuff, strlen(sendBuff)) != (int)strlen(sendBuff)) {
+    if (wolfSSL_write(ssl, sendBuff, strlen(sendBuff)) != (int)strlen(sendBuff)) {
 		fprintf(stderr, "ERROR: failed to write\n");
 		goto err_ssl;
 	}
 
-    	ret = wolfSSL_read(ssl, rcvBuff, MAXDATASIZE);
+    ret = wolfSSL_read(ssl, rcvBuff, MAXDATASIZE);
 	if (ret == -1) {
 		fprintf(stderr, "ERROR: failed to read\n");
 		goto err_ssl;
 	}
 
-    	err_ssl:
-	    	wolfSSL_free(ssl);
-    	err_ctx:
-	    	wolfSSL_CTX_free(ctx);
-    	err:
-	    	wolfSSL_Cleanup();
+    err_ssl:
+	   	wolfSSL_free(ssl);
+    err_ctx:
+	   	wolfSSL_CTX_free(ctx);
+    err:
+	   	wolfSSL_Cleanup();
 
 	return ret;
 
