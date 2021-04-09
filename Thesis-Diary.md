@@ -1,3 +1,13 @@
+## 2021-04-09
+    1. Tried out the Inclavare cluster attestation - implemented RA over the network, encountered an issue with certificate validation;
+    2. In discussion with Inclavare about fixing the error;
+    3. Next week: same scenario with Occlum.
+
+### Action points until next meeting:
+   1. Finish the set up the enclave+attest+establish secure channel chain;
+   2. Guarantees about destroying enclave;
+   3. Start thinking about performance.
+
 ## 2021-03-26
     1. Working on generating elements for secure channel establishment between client and enclave
     2. Full focus on DCAP
