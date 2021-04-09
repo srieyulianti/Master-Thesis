@@ -133,6 +133,8 @@ clean:
 	$(MAKE) -C $(SGX_RA_TLS) clean
 	$(MAKE) -C $(RA_TLS_SERVER) clean
 	rm -f wolfssl/IDE/LINUX-SGX/libwolfssl.sgx.static.lib.a
+	rm -r curl-wolfssl
+	rm -r wolfssl
 
 mrproper:
 	$(MAKE) clean

@@ -37,6 +37,7 @@
 
 #include <wolfssl/ssl.h>
 #include <wolfssl/certs_test.h>
+#include <time.h>
 
 #define SRV_PORT 8081
 
@@ -132,7 +133,7 @@ int server_connect(sgx_enclave_id_t id)
 	if (sgxStatus != SGX_SUCCESS || ret != SSL_SUCCESS)
 		goto err_ssl;
 
-	fprintf(stdout, "Client connected successfully\n");
+	fprintf(stdout, "[+] Client connected successfully\n");
 
 	/* Read the client data into our buff array */
 	memset(buff, 0, sizeof(buff));
