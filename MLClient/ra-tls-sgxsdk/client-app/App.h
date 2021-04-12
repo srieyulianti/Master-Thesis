@@ -26,7 +26,6 @@
 #include <sys/types.h>		/* for send/recv */
 #include <sys/socket.h>		/* for send/recv */
 
-/* contains untrusted wrapper functions used to call enclave functions */
 
 #define BENCH_RSA
 #define ENCLAVE_FILENAME "Wolfssl_Enclave.signed.so"

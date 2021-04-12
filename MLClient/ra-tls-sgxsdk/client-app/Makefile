@@ -60,8 +60,6 @@ DCAP_Library_Name := sgx_dcap_ql
 Urts_Library_Name := sgx_urts
 Uae_Library_Name := sgx_quote_ex
 
-
-
 Wolfssl_C_Extra_Flags := -DWOLFSSL_SGX -DUSE_WOLFSSL
 ifdef ECDSA
 	Wolfssl_C_Extra_Flags += -DRATLS_ECDSA
@@ -120,15 +118,6 @@ endif
 
 all: libra-tls-client.a libsgxsdk-ra-attester_u.a App
 
-Wolfssl_Enclave_u.c: $(SGX_EDGER8R) $(TOPDIR)/sgxsdk_enclave/Wolfssl_Enclave.edl
-	@$(SGX_EDGER8R) --untrusted $(TOPDIR)/sgxsdk_enclave/Wolfssl_Enclave.edl --search-path $(TOPDIR)/sgxsdk_enclave --search-path $(SGX_SDK)/include --search-path $(SGX_RA_TLS_ROOT)
-	@echo "GEN  =>  $@"
-
-Wolfssl_Enclave_u.o: Wolfssl_Enclave_u.c
-	@echo $(CC) $(App_C_Flags) -c $< -o $@
-	@$(CC) $(App_C_Flags) -c $< -o $@
-	@echo "CC   <=  $<"
-
 ra-tls-client.o: ra-tls-client.c 
 	@echo $(CC) $(App_C_FLags) -c $< -o $@
 	@$(CC) $(App_C_Flags) -c $< -o $@
@@ -160,6 +149,6 @@ App: App.o $(App_C_Objects) libra-tls-client.a libsgxsdk-ra-attester_u.a $(LIBDI
 .PHONY: clean
 
 clean:
-	@rm -f libra-tls-client.* $(App_C_Objects) Wolfssl_Enclave_u.* 
+	@rm -f libra-tls-client.* $(App_C_Objects)  
 	@rm -f libsgxsdk-ra-attester_u.a
 	@rm -f App

@@ -23,7 +23,6 @@
 #define RA_TLS_CLIENT_H
 
 #include "sgx_urts.h"	 /* for enclave_id etc.*/
-  /* contains untrusted wrapper functions used to call enclave functions*/
 
 int client_connect(sgx_enclave_id_t id);
 
