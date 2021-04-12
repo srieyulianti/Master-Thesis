@@ -129,7 +129,7 @@ clean:
 	rm -rf $(PREFIX)
 	[ -d curl-wolfssl ] && $(MAKE) clean -C curl-wolfssl || true
 	[ -d wolfssl ] && $(MAKE) clean -C wolfssl || true
-	$(MAKE) -C sgxsdk_enclave clean
+	$(MAKE) -C $(TOPDIR)/sgxsdk_enclave clean
 	$(MAKE) -C $(SGX_RA_TLS) clean
 	$(MAKE) -C $(RA_TLS_SERVER) clean
 	rm -f wolfssl/IDE/LINUX-SGX/libwolfssl.sgx.static.lib.a
