@@ -9,7 +9,7 @@ WOLFSSL_ROOT ?= $(shell readlink -f $(TOPDIR)/wolfssl)
 SGX_WOLFSSL_LIB ?= $(shell readlink -f $(WOLFSSL_ROOT)/IDE/LINUX-SGX)
 SGX_RA_TLS_ROOT ?= $(shell readlink -f $(TOPDIR)/sgx-ra-tls)
 
-ifdef ECDSA
+
 SGX_DCAP ?= SGXDataCenterAttestationPrimitives
 SGX_DCAP_INC := -I$(SGX_DCAP)/QuoteGeneration/quote_wrapper/ql/inc \
 		-I$(SGX_DCAP)/QuoteGeneration/quote_wrapper/common/inc  \
@@ -19,7 +19,7 @@ SGX_DCAP_INC := -I$(SGX_DCAP)/QuoteGeneration/quote_wrapper/ql/inc \
 		-I../build/include \
 		-I/usr/x86_64-linux-gnu/include \
 		-I/usr/include/x86_64-linux-gnu 
-endif
+
 
 ifeq ($(shell getconf LONG_BIT), 32)
 	SGX_ARCH := x86
@@ -53,18 +53,14 @@ endif
 
 ######## App Settings ########
 
-
 DCAP_Library_Name := sgx_dcap_ql
 Urts_Library_Name := sgx_urts
 Uae_Library_Name := sgx_quote_ex
 
 Wolfssl_C_Extra_Flags := -DWOLFSSL_SGX -DUSE_WOLFSSL
-ifdef ECDSA
-	Wolfssl_C_Extra_Flags += -DRATLS_ECDSA
-endif
-ifdef LA
-	Wolfssl_C_Extra_Flags += -DLA_REPORT
-endif
+
+Wolfssl_C_Extra_Flags += -DRATLS_ECDSA
+
 
 Wolfssl_Include_Paths := -I$(WOLFSSL_ROOT) \
 	-I$(WOLFSSL_ROOT)/wolfcrypt \
@@ -80,10 +76,7 @@ ifeq ($(HAVE_WOLFSSL_BENCHMARK), 1)
 	Wolfssl_C_Extra_Flags += -DHAVE_WOLFSSL_BENCHMARK
 endif
 
-App_C_Files := App.c ra-tls-server.c sgxsdk-ra-attester_u.c
-ifndef ECDSA
-	App_C_Files += ias-ra.c
-endif
+App_C_Files := ra-tls-server.c sgxsdk-ra-attester_u.c
 
 App_Include_Paths := $(Wolfssl_Include_Paths) -I$(SGX_SDK)/include -I$(SGX_RA_TLS_ROOT) -I$(INCDIR) $(SGX_DCAP_INC) -I$(shell readlink -f .)
 App_C_Flags := $(SGX_COMMON_CFLAGS) -fPIC -shared -Wno-attributes -Wall -Wno-unused-const-variable $(App_Include_Paths) $(Wolfssl_C_Extra_Flags)
@@ -115,22 +108,18 @@ endif
 
 .PHONY: all
 
-all: libra-tls-server.a libsgxsdk-ra-attester_u.a App
+all: libsgxsdk-ra-attester_u.a ra-tls-server
 
 %.o: %.c
 	@echo $(CC) $(App_C_Flags) -c $< -o $@
 	@$(CC) $(App_C_Flags) -c $< -o $@
 	@echo "CC  <=  $<"
 
-libra-tls-server.a: $(App_C_Objects) $(LIBDIR)/libcurl-wolfssl.a $(LIBDIR)/libwolfssl.a
-	$(AR) rcs $@ $^
-	@echo "LINK =>  $@"
-
 libsgxsdk-ra-attester_u.a: sgxsdk-ra-attester_u.o
 	$(AR) rcs $@ $^
 	@echo "LINK =>  $@"
 
-App: libra-tls-server.a libsgxsdk-ra-attester_u.a
+ra-tls-server: ra-tls-server.c libsgxsdk-ra-attester_u.a $(LIBDIR)/libcurl-wolfssl.a $(LIBDIR)/libwolfssl.a
 	@$(CC) $^ -o $@ $(App_Link_Flags)
 	@echo "LINK => $@"
 
@@ -138,6 +127,6 @@ App: libra-tls-server.a libsgxsdk-ra-attester_u.a
 .PHONY: clean
 
 clean:
-	@rm -f libra-tls-server.* $(App_C_Objects) 
+	@rm -f ra-tls-server $(App_C_Objects) 
 	@rm -f libsgxsdk-ra-attester_u.a
-	@rm -f App
+	

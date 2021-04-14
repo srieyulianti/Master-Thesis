@@ -14,36 +14,32 @@ SGX_RA_TLS := $(TOPDIR)/sgx-ra-tls
 WOLFSSL := $(TOPDIR)/wolfssl
 RA_TLS_SERVER := $(TOPDIR)/ra-tls-server
 
-ifdef ECDSA
-  SGX_DCAP_URI := https://github.com/intel/SGXDataCenterAttestationPrimitives
-  SGX_DCAP_COMMIT := bfab1376480f760757738092399d0d99b22f4dfd
-  SGX_DCAP ?= SGXDataCenterAttestationPrimitives
-  SGX_DCAP_INC := -I$(SGX_DCAP)/QuoteGeneration/quote_wrapper/common/inc \
+
+SGX_DCAP_URI := https://github.com/intel/SGXDataCenterAttestationPrimitives
+SGX_DCAP_COMMIT := bfab1376480f760757738092399d0d99b22f4dfd
+SGX_DCAP ?= SGXDataCenterAttestationPrimitives
+SGX_DCAP_INC := -I$(SGX_DCAP)/QuoteGeneration/quote_wrapper/common/inc \
 		  -I$(SGX_DCAP)/QuoteGeneration/pce_wrapper/inc \
 		  -I$(SGX_DCAP)/QuoteVerification/QVL/Src/AttestationLibrary/include \
 		  -I$(SGX_DCAP)/QuoteVerification/dcap_quoteverify/inc
-endif
 
 CFLAGS += -std=gnu99 -I$(SGX_RA_TLS) -I$(SGX_SDK)/include -I$(INCDIR) $(SGX_DCAP_INC) -fPIC
 CFLAGS += $(CFLAGSERRORS) -g -ggdb -O0 -DWOLFSSL_SGX_ATTESTATION -DWOLFSSL_CERT_EXT # -DDEBUG -DDYNAMIC_RSA
 CFLAGS += -DSGX_GROUP_OUT_OF_DATE
-ifdef ECDSA
-	CFLAGS += -DRATLS_ECDSA
-else ifdef LA
-	CFLAGS += -DLA_REPORT
-endif
+
+CFLAGS += -DRATLS_ECDSA
 
 CC ?= gcc
 
 export DEBUG PREFIX BINDIR LIBDIR INCDIR SGX_SDK SGX_RA_TLS WOLFSSL CC
 
 deps := $(LIBDIR)/libwolfssl.a $(LIBDIR)/libwolfssl.sgx.static.lib.a $(LIBDIR)/libsgx_ra_tls_wolfssl.a $(LIBDIR)/libcurl-wolfssl.a
-all: $(deps) $(BINDIR)/App 
+all: $(deps) $(BINDIR)/ra-tls-server 
 
-$(BINDIR)/App: $(BINDIR) $(LIBDIR)/libcurl-wolfssl.a $(LIBDIR)/libwolfssl.a
+$(BINDIR)/ra-tls-server: $(BINDIR) $(LIBDIR)/libcurl-wolfssl.a $(LIBDIR)/libwolfssl.a
 	make -C $(RA_TLS_SERVER)
 	cp -f $(RA_TLS_SERVER)/libsgxsdk-ra-attester_u.a $(LIBDIR)/
-	cp -f $(RA_TLS_SERVER)/App $@
+	cp -f $(RA_TLS_SERVER)/ra-tls-server $@
 
 # Add --enable-debug to ./configure for debug build
 # WOLFSSL_ALWAYS_VERIFY_CB: Always call certificate verification callback, even if verification succeeds
@@ -77,15 +73,10 @@ wolfssl:
 #
 # -DFP_MAX_BITS=8192 required for RSA keys > 2048 bits to work
 $(LIBDIR)/libwolfssl.sgx.static.lib.a: $(LIBDIR) $(LIBDIR)/libsgx_ra_tls_wolfssl.a $(LIBDIR)/libwolfssl.a
-ifdef LA
-	cd wolfssl/IDE/LINUX-SGX && \
-	  make -f sgx_t_static.mk CFLAGS="-DLA_REPORT -DUSER_TIME -DWOLFSSL_SGX_ATTESTATION -DWOLFSSL_KEY_GEN -DWOLFSSL_CERT_GEN -DWOLFSSL_CERT_EXT -DFP_MAX_BITS=8192" && \
-	  cp -f libwolfssl.sgx.static.lib.a "$@"
-else
-	cd wolfssl/IDE/LINUX-SGX && \
-	  make -f sgx_t_static.mk CFLAGS="-DUSER_TIME -DWOLFSSL_SGX_ATTESTATION -DWOLFSSL_KEY_GEN -DWOLFSSL_CERT_GEN -DWOLFSSL_CERT_EXT -DFP_MAX_BITS=8192" && \
-	  cp -f libwolfssl.sgx.static.lib.a "$@"
-endif
+
+cd wolfssl/IDE/LINUX-SGX && \
+  make -f sgx_t_static.mk CFLAGS="-DUSER_TIME -DWOLFSSL_SGX_ATTESTATION -DWOLFSSL_KEY_GEN -DWOLFSSL_CERT_GEN -DWOLFSSL_CERT_EXT -DFP_MAX_BITS=8192" && \
+  cp -f libwolfssl.sgx.static.lib.a "$@"
 
 $(LIBDIR)/libsgx_ra_tls_wolfssl.a: $(LIBDIR)
 # Previous Makefile compiles these .o files with incorrect C flags
@@ -125,7 +116,6 @@ clean:
 	rm -rf $(PREFIX)
 	[ -d curl-wolfssl ] && $(MAKE) clean -C curl-wolfssl || true
 	[ -d wolfssl ] && $(MAKE) clean -C wolfssl || true
-	$(MAKE) -C $(TOPDIR)/sgxsdk_enclave clean
 	$(MAKE) -C $(SGX_RA_TLS) clean
 	$(MAKE) -C $(RA_TLS_SERVER) clean
 	rm -f wolfssl/IDE/LINUX-SGX/libwolfssl.sgx.static.lib.a
