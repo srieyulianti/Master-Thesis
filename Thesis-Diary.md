@@ -1,3 +1,18 @@
+## 2021-04-16
+    1. troubleshooting quote verification issue: 'warning a007' - due to
+    vulnerability to LVI, no mitigations can prevent this atm; suggestion to
+    "change platform" (however this is the Azure platform offered to businesses!)
+    Statement from the Inclavare engineer;
+    2. Continuing with occlum and mbedTLS (important to try and maintain Occlum
+      as main working library OS)
+
+### Action points until next meeting:
+   1. Finish the set up the enclave+attest+establish secure channel chain;
+   2. Guarantees about destroying enclave;
+   3. Start thinking about measuring performance.
+
+
+
 ## 2021-04-09
     1. Tried out the Inclavare cluster attestation - implemented RA over the network, encountered an issue with certificate validation;
     2. In discussion with Inclavare about fixing the error;
