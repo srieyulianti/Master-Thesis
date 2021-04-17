@@ -1,129 +1,63 @@
-TOPDIR := $(shell readlink -f .)
-export TOPDIR
+BIN_PATH := bin
+OBJ_PATH := obj
+SRC_PATH := src
+LIB_PATH := lib
+INC_PATH := include
+SCRIPT_PATH := Scripts
+SGX_SDK_INC_PATH := /opt/intel/sgxsdk/include
 
-DEBUG ?= 1
-SGX_DEBUG ?= 1
+CC := gcc
+CCFLAGS := -I$(INC_PATH) -I$(SGX_SDK_INC_PATH)
+CCOBJFLAGS := $(CCFLAGS) -c
 
-PREFIX ?= $(TOPDIR)/build
-BINDIR := $(PREFIX)/bin
-LIBDIR := $(PREFIX)/lib
-INCDIR := $(PREFIX)/include
+TARGET_NAME := ra-tls-server
+TARGET := $(BIN_PATH)/$(TARGET_NAME)
 
-SGX_SDK ?= /opt/intel/sgxsdk
-SGX_RA_TLS := $(TOPDIR)/sgx-ra-tls
-WOLFSSL := $(TOPDIR)/wolfssl
-RA_TLS_SERVER := $(TOPDIR)/ra-tls-server
+SRC := $(foreach x, $(SRC_PATH), $(wildcard $(addprefix $(x)/*,.c*)))
+OBJ := $(addprefix $(OBJ_PATH)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
 
+CLEAN_LIST := $(BIN_PATH)  $(OBJ_PATH) $(LIB_PATH)
 
-SGX_DCAP_URI := https://github.com/intel/SGXDataCenterAttestationPrimitives
-SGX_DCAP_COMMIT := bfab1376480f760757738092399d0d99b22f4dfd
-SGX_DCAP ?= SGXDataCenterAttestationPrimitives
-SGX_DCAP_INC := -I$(SGX_DCAP)/QuoteGeneration/quote_wrapper/common/inc \
-		  -I$(SGX_DCAP)/QuoteGeneration/pce_wrapper/inc \
-		  -I$(SGX_DCAP)/QuoteVerification/QVL/Src/AttestationLibrary/include \
-		  -I$(SGX_DCAP)/QuoteVerification/dcap_quoteverify/inc
+.PHONY: all mkdir clean
 
-CFLAGS += -std=gnu99 -I$(SGX_RA_TLS) -I$(SGX_SDK)/include -I$(INCDIR) $(SGX_DCAP_INC) -fPIC
-CFLAGS += $(CFLAGSERRORS) -g -ggdb -O0 -DWOLFSSL_SGX_ATTESTATION -DWOLFSSL_CERT_EXT # -DDEBUG -DDYNAMIC_RSA
-CFLAGS += -DSGX_GROUP_OUT_OF_DATE
+default: mkdir all
 
-CFLAGS += -DRATLS_ECDSA
+mkdir:
+	@mkdir -p $(BIN_PATH) $(OBJ_PATH) $(LIB_PATH)
 
-CC ?= gcc
+all: $(TARGET)
 
-export DEBUG PREFIX BINDIR LIBDIR INCDIR SGX_SDK SGX_RA_TLS WOLFSSL CC
+$(TARGET) :=  $(OBJ) mbedtls/.mbedtls_built $(LIB_PATH)/libra_tls_attest.so
+	$(CC) $(CCFLAGS) -o $@ $(OBJ)
 
-deps := $(LIBDIR)/libwolfssl.a $(LIBDIR)/libwolfssl.sgx.static.lib.a $(LIBDIR)/libsgx_ra_tls_wolfssl.a $(LIBDIR)/libcurl-wolfssl.a
-all: $(deps) $(BINDIR)/ra-tls-server 
+############################# MBEDTLS DEPENDENCY ##############################
 
-$(BINDIR)/ra-tls-server: $(BINDIR) $(LIBDIR)/libcurl-wolfssl.a $(LIBDIR)/libwolfssl.a
-	make -C $(RA_TLS_SERVER)
-	cp -f $(RA_TLS_SERVER)/libsgxsdk-ra-attester_u.a $(LIBDIR)/
-	cp -f $(RA_TLS_SERVER)/ra-tls-server $@
+MBEDTLS_VERSION ?= 2.26.0
+MBEDTLS_SRC ?= mbedtls-$(MBEDTLS_VERSION).tar.gz
+MBEDTLS_URI ?= \
+	https://github.com/ARMmbed/mbedtls/archive \
+	https://packages.grapheneproject.io/distfiles
+MBEDTLS_CHECKSUM ?= 35d8d87509cd0d002bddbd5508b9d2b931c5e83747d087234cc7ad551d53fe05
 
-# Add --enable-debug to ./configure for debug build
-# WOLFSSL_ALWAYS_VERIFY_CB: Always call certificate verification callback, even if verification succeeds
-# KEEP_OUR_CERT: Keep the certificate around after the handshake
-# --enable-tlsv10: required by libcurl
-# 2019-03-19 removed --enable-intelasm configure flag. The Celeron NUC I am developing this, does not support AVX.
-WOLFSSL_CFLAGS := -DWOLFSSL_SGX_ATTESTATION -DWOLFSSL_ALWAYS_VERIFY_CB -DKEEP_PEER_CERT -Wno-stringop-truncation
-ifdef DEBUG
-	WOLFSSL_CONFFLAGS += --enable-debug
+ifeq ($(DEBUG),1)
+MBED_BUILD_TYPE=Debug
+else
+MBED_BUILD_TYPE=Release
 endif
-$(LIBDIR)/libwolfssl.a: CFLAGS += $(WOLFSSL_CFLAGS)
-$(LIBDIR)/libwolfssl.a: $(LIBDIR) wolfssl
-	cd wolfssl && $(MAKE) install
 
-wolfssl: WOLFSSL_CONFIGURE_FLAGS := --prefix=$(shell readlink -f $(PREFIX)) --enable-writedup --enable-static --enable-keygen --enable-certgen --enable-certext --with-pic --disable-examples --disable-crypttests --enable-aesni --enable-tlsv10 $(WOLFSSL_CONFFLAGS)
-# To avoid unneccessary macro definition to be wrote into options.h. If make ECDSA=1(compiling attestation based on ECDSA) firstly,
-# then RATLS_ECDSA will be wrote into options.h, even just make(compiling attestation based on EPID), the RATLS_ECDSA will still be in
-# options.h. So it needs be reconfigured before compiling, options.h will be re-generated according to new configuration.
-wolfssl:
-	if [ ! -d "./wolfssl" ]; then \
-		git clone -b v4.6.0-stable https://github.com/wolfSSL/wolfssl && \
-		cd wolfssl && \
-		git apply ../patch/wolfssl.patch; \
-	fi
-	cd wolfssl && ./autogen.sh && \
-	  CFLAGS="$(CFLAGS)" ./configure $(WOLFSSL_CONFIGURE_FLAGS)
+$(MBEDTLS_SRC):
+	$(SCRIPT_PATH)/download --output $@ $(foreach mirror,$(MBEDTLS_URI),--url $(mirror)/$(MBEDTLS_SRC)) --sha256 $(MBEDTLS_CHECKSUM)
 
-# Ideally, libwolfssl.sgx.static.lib.a and libwolfssl.a could be built
-# in parallel. Does not work however. Hence, the dependency forces a
-# serial build.
-#
-# -DFP_MAX_BITS=8192 required for RSA keys > 2048 bits to work
-$(LIBDIR)/libwolfssl.sgx.static.lib.a: $(LIBDIR) $(LIBDIR)/libsgx_ra_tls_wolfssl.a $(LIBDIR)/libwolfssl.a
+mbedtls/.mbedtls_downloaded: $(MBEDTLS_SRC)
+	tar --touch -xzf $(MBEDTLS_SRC)
+	mv mbedtls-mbedtls-$(MBEDTLS_VERSION) mbedtls
+	touch $@
 
-cd wolfssl/IDE/LINUX-SGX && \
-  make -f sgx_t_static.mk CFLAGS="-DUSER_TIME -DWOLFSSL_SGX_ATTESTATION -DWOLFSSL_KEY_GEN -DWOLFSSL_CERT_GEN -DWOLFSSL_CERT_EXT -DFP_MAX_BITS=8192" && \
-  cp -f libwolfssl.sgx.static.lib.a "$@"
+mbedtls/.mbedtls_configured: mbedtls/.mbedtls_downloaded
+	mkdir -p mbedtls/install
+	cd mbedtls && ./scripts/config.pl set MBEDTLS_CMAC_C MBEDTLS_ERROR_C
+	touch $@
 
-$(LIBDIR)/libsgx_ra_tls_wolfssl.a: $(LIBDIR)
-# Previous Makefile compiles these .o files with incorrect C flags
-# Don't disturb the build of libsgx_ra_tls_wolfssl.a
-	rm -f $(SGX_RA_TLS)/wolfssl-ra-challenger.o $(SGX_RA_TLS)/wolfssl-ra.o $(SGX_RA_TLS)/ra-challenger.o $(SGX_RA_TLS)/ias_sign_ca_cert.o
-	$(MAKE) -C $(SGX_RA_TLS) && \
-	  mv -f $(SGX_RA_TLS)/libsgx_ra_tls_wolfssl.a "$@"
-# Don't disturb the build of libra-challenger.a
-	rm -f $(SGX_RA_TLS)/wolfssl-ra-challenger.o $(SGX_RA_TLS)/wolfssl-ra.o $(SGX_RA_TLS)/ra-challenger.o $(SGX_RA_TLS)/ias_sign_ca_cert.o
-
-$(LIBDIR)/libcurl-wolfssl.a: $(LIBDIR) curl-wolfssl $(LIBDIR)/libwolfssl.a
-	cd curl-wolfssl && $(MAKE) && \
-	  cp -f lib/.libs/libcurl.a "$@"
-
-
-CURL_CONFFLAGS := --prefix=$(shell readlink -f $(PREFIX)) --without-libidn --without-librtmp --without-libssh2 --without-libmetalink --without-libpsl --disable-ldap --disable-ldaps --disable-shared
-ifdef DEBUG
-CURL_CONFFLAGS += --enable-debug
-endif
-curl-wolfssl:
-	if [ ! -d "./curl-wolfssl" ]; then \
-	  git clone https://github.com/curl/curl.git -b curl-7_47_0 curl-wolfssl; \
-	fi
-	cd curl-wolfssl && ./buildconf && \
-	  CFLAGS="-fPIC" ./configure $(CURL_CONFFLAGS) --without-ssl --with-cyassl=$(shell readlink -f $(PREFIX))
-
-$(LIBDIR)/libra-attester.a: wolfssl wolfssl-ra-attester.o wolfssl-ra.o ias-ra.o
-	$(AR) rcs $@ $(filter %.o, $^)
-
-$(BINDIR):
-	mkdir -p "$(BINDIR)"
-
-$(LIBDIR):
-	mkdir -p "$(LIBDIR)"
-
-clean:
-	rm -rf $(PREFIX)
-	[ -d curl-wolfssl ] && $(MAKE) clean -C curl-wolfssl || true
-	[ -d wolfssl ] && $(MAKE) clean -C wolfssl || true
-	$(MAKE) -C $(SGX_RA_TLS) clean
-	$(MAKE) -C $(RA_TLS_SERVER) clean
-	rm -f wolfssl/IDE/LINUX-SGX/libwolfssl.sgx.static.lib.a
-	rm -r curl-wolfssl
-	rm -r wolfssl
-
-mrproper:
-	$(MAKE) clean
-	rm -rf curl-wolfssl wolfssl
-
-.PHONY: all clean mrproper wolfssl curl-wolfssl
+mbedtls/.mbedtls_built: mbedtls/.mbedtls_configured
+	$(MAKE) -C mbedtls SHARED=1 DESTDIR=install install .
+	touch $@
