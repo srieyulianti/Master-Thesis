@@ -61,3 +61,7 @@ mbedtls/.mbedtls_configured: mbedtls/.mbedtls_downloaded
 mbedtls/.mbedtls_built: mbedtls/.mbedtls_configured
 	$(MAKE) -C mbedtls SHARED=1 DESTDIR=install install .
 	touch $@
+
+LDFLAGS += -Lmbedtls/install/lib -Wl, -rpath,.
+$(LIB_PATH)/libra_tls_attest.so: ra_tls_attest.o
+	$(CC) $^ $(LDFLAGS) -l:libmbedx509.a -l:libmbedcrypto.a -shared -o $@
