@@ -1,0 +1,113 @@
+BIN_PATH := bin
+OBJ_PATH := obj
+SRC_PATH := src
+LIB_PATH := lib
+INC_PATH := include
+SCRIPT_PATH := scripts
+SGX_SDK_INC_PATH := /opt/intel/sgxsdk/include
+MBEDTLS_PATH := mbedtls/include
+SGX_LIB := /usr/lib/x86_64-linux-gnu
+
+CC := gcc
+CCFLAGS := -I$(INC_PATH) -I$(SGX_SDK_INC_PATH) -I$(MBEDTLS_PATH) -fPIC
+CCOBJFLAGS := $(CCFLAGS) -c
+
+TARGET_NAME := ra-tls-client
+TARGET := $(BIN_PATH)/$(TARGET_NAME)
+
+CLEAN_LIST := $(BIN_PATH) $(OBJ_PATH) $(LIB_PATH) mbedtls ra_tls_instance mbedtls-2.26.0.tar.gz
+
+.PHONY: all mkdir clean
+
+default: mkdir all
+
+mkdir:
+	@mkdir -p $(BIN_PATH) $(OBJ_PATH) $(LIB_PATH)
+	
+all: mbedtls/.mbedtls_built $(LIB_PATH)/.mbedtls_libs_copied $(TARGET)
+
+
+############################# MBEDTLS DEPENDENCY ##############################
+
+MBEDTLS_VERSION ?= 2.26.0
+MBEDTLS_SRC ?= mbedtls-$(MBEDTLS_VERSION).tar.gz
+MBEDTLS_URI ?= \
+	       https://github.com/ARMmbed/mbedtls/archive \
+	       https://packages.grapheneproject.io/distfiles
+MBEDTLS_CHECKSUM ?= 35d8d87509cd0d002bddbd5508b9d2b931c5e83747d087234cc7ad551d53fe05
+
+ifeq ($(DEBUG),1)
+MBED_BUILD_TYPE=Debug
+else
+MBED_BUILD_TYPE=Release
+endif
+
+$(MBEDTLS_SRC):
+	$(SCRIPT_PATH)/download --output $@ $(foreach mirror,$(MBEDTLS_URI),--url $(mirror)/$(MBEDTLS_SRC)) --sha256 $(MBEDTLS_CHECKSUM)
+
+mbedtls/.mbedtls_downloaded: $(MBEDTLS_SRC)
+	tar --touch -xzf $(MBEDTLS_SRC)
+	mv mbedtls-mbedtls-$(MBEDTLS_VERSION) mbedtls
+	touch $@
+
+mbedtls/.mbedtls_configured: mbedtls/.mbedtls_downloaded
+	mkdir -p mbedtls/install
+	cd mbedtls && ./scripts/config.pl set MBEDTLS_CMAC_C MBEDTLS_ERROR_C
+	touch $@
+
+mbedtls/.mbedtls_built: mbedtls/.mbedtls_configured
+	$(MAKE) -C mbedtls SHARED=1 DESTDIR=install install .
+	touch $@
+
+$(LIB_PATH)/.mbedtls_libs_copied: mbedtls/.mbedtls_built
+	cd $(LIB_PATH)                                  && \
+	cp ../mbedtls/install/lib/libmbedcrypto.so.* .  && \
+	ln -s libmbedcrypto.so.* libmbedcrypto.so       && \
+	cp ../mbedtls/install/lib/libmbedtls.so.* .     && \
+	ln -s libmbedtls.so.* libmbedtls.so             && \
+	cp ../mbedtls/install/lib/libmbedx509.so.* .    && \
+	ln -s libmbedx509.so.* libmbedx509.so
+	
+	touch $@
+
+############################ RA-TLS-CLIENT DEPENDENCY ###########################
+
+LDFLAGS += -Lmbedtls/install/lib -L$(SGX_LIB)
+LFLAGS += -Wl,-ldl
+
+$(OBJ_PATH)/quote_verification.o: $(SRC_PATH)/quote_verification.c
+	@echo $(CC) $(CCOBJFLAGS) $< -o $@
+	$(CC) $(CCOBJFLAGS) $< -o $@
+	@echo "CC <= $<"
+
+$(OBJ_PATH)/ra_tls_verify_common.o: $(SRC_PATH)/ra_tls_verify_common.c
+	@echo $(CC) $(CCOBJFLAGS) $< -o $@
+	$(CC) $(CCOBJFLAGS) $< -o $@
+	@echo "CC <= $<"
+
+$(OBJ_PATH)/ra_tls_verify_dcap.o: $(SRC_PATH)/ra_tls_verify_dcap.c $(OBJ_PATH)/ra_tls_verify_common.o $(OBJ_PATH)/quote_verification.o
+	@echo $(CC) $(CCOBJFLAGS) $< -o $@
+	$(CC) $(CCOBJFLAGS) $< -o $@
+	@echo "CC <= $<"
+
+$(LIB_PATH)/libra_tls_verify_dcap.so: $(OBJ_PATH)/ra_tls_verify_common.o $(OBJ_PATH)/ra_tls_verify_dcap.o $(OBJ_PATH)/quote_verification.o
+	@echo $(CC) $^ $(LDFLAGS) -l:libmbedx509.a -l:libmbedcrypto.a -l:libsgx_dcap_quoteverify.so.1 -shared -o $@
+	$(CC) $^ $(LDFLAGS) -l:libmbedx509.a -l:libmbedcrypto.a -l:libsgx_dcap_quoteverify.so.1 -shared -o $@
+	cp -f $(SGX_LIB)/libsgx_urts.so $(LIB_PATH)
+	@echo "CC <= $<"
+
+$(OBJ_PATH)/client.o: $(SRC_PATH)/client.c $(LIB_PATH)/libra_tls_verify_dcap.so $(LIB_PATH)/libsgx_urts.so
+	@echo $(CC) $(CCOBJFLAGS) $< -o $@
+	$(CC) $(CCOBJFLAGS) $< -o $@
+	@echo "CC <= $<"
+
+$(TARGET): $(OBJ_PATH)/client.o $(LIB_PATH)/libmbedcrypto.so $(LIB_PATH)/libmbedtls.so $(LIB_PATH)/libmbedx509.so 
+	@echo $(CC) $^ -o $@ $(LFLAGS)
+	$(CC) $^ -o $@ $(LFLAGS)
+	@echo "CC <= $^"
+
+
+clean:
+	@rm -rf $(CLEAN_LIST)
+
+
