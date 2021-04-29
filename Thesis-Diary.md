@@ -1,3 +1,16 @@
+## 2021-04-23
+    1. Implement RA-TLS with Occlum and mbedTLS (using Occlum ra-mbedtls, dcap)
+    2. can the verifier (client) be run outside of an enclave? most likely,
+    and that will remove the requirement.
+
+### Action points until next meeting:
+    1. Integrate CURL to transfer model to the enclave;
+    2. Run the verifier (client) outside of the enclave;
+    3. Data streaming;
+    4. Performance testing;
+
+
+
 ## 2021-04-16
     1. troubleshooting quote verification issue: 'warning a007' - due to
     vulnerability to LVI, no mitigations can prevent this atm; suggestion to
