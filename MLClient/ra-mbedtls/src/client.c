@@ -66,8 +66,11 @@ void (*ra_tls_set_measurement_callback_f)(int (*f_cb)(const char* mrenclave, con
 /* Server environment definition */
 #define SERVER_PORT "8081"
 #define SERVER_NAME "server"
-#define GET_REQUEST "GET / HTTP/1.0\r\n\r\n"
-#define CURL_REQUEST "curl https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_2018_02_22/mobilenet_v1_1.0_224.tgz\r\n\r\n"
+/*#define GET_REQUEST "GET / HTTP/1.0\r\n\r\n"*/
+#define CURL_REQUEST1 "https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_2018_02_22/mobilenet_v1_1.0_224.tgz"
+#define CURL_REQUEST2 "https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_1.0_224_frozen.tgz"
+
+#define SIZE 4096
 
 #define DEBUG_LEVEL 0
 
@@ -315,10 +318,55 @@ int main(int argc, char** argv) {
      * a message or writing the buffer to the server
      */
     mbedtls_printf("[+] Handshake has been performed successfully...\n\n");
-    mbedtls_printf("[+]  > Write to server:");
+    mbedtls_printf("[+]  > Send tflite model to server...\n");
     fflush(stdout);
 
-    len = sprintf((char*)buf, CURL_REQUEST);
+    /***************************** MODEL DEFINITION AND SUBMITION ********************************/
+    /* Get Model Size */
+    FILE *model;
+    model = fopen("../models/mobilenet_v1_1.0_224.tflite", "r");
+    int size;
+    fseek(model, 0, SEEK_END);
+    size = ftell(model);
+    fseek(model, 0, SEEK_SET);
+
+    /* Send Model Size */
+    mbedtls_printf("[+] Sending model size...\n");
+    if((ret = mbedtls_ssl_write(&ssl, &size, sizeof(size))) <= 0){
+	    if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
+		    mbedtls_printf("[-] failed\n  ! mbedtls_ssl_write returned %d\n\n", ret);
+		    goto exit;
+	    }
+    }
+    mbedtls_printf("[+] The model size is: %d\n", size);
+
+
+
+    /* Send Model as Byte Array */
+    mbedtls_printf("[+] Sending model as a byte array...\n");
+    {
+    	char send_buffer[SIZE];
+    	int nb = fread(send_buffer, 1, sizeof(send_buffer), model);
+    	while(!feof(model)){
+	    	mbedtls_ssl_write(&ssl, send_buffer, nb);
+	    	nb = fread(send_buffer, 1, sizeof(send_buffer), model);
+    	}
+
+	/*char send_buffer[size];
+
+	while(!feof(model)){
+		fread(send_buffer, 1, sizeof(send_buffer), model);
+		mbedtls_ssl_write(&ssl, send_buffer, sizeof(send_buffer));
+		bzero(send_buffer, sizeof(send_buffer));
+	}*/
+    }
+    mbedtls_printf("[+] The model is successfully submitted...\n");
+
+
+
+    /*len = sprintf((char*)buf, CURL_REQUEST1);
+    mbedtls_printf("Len size:%d", len);
+    mbedtls_printf("\r\n\r\n");
 
     while ((ret = mbedtls_ssl_write(&ssl, buf, len)) <= 0) {
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
@@ -329,9 +377,11 @@ int main(int argc, char** argv) {
 
     len = ret;
     mbedtls_printf(" %lu bytes written\n\n%s", len, (char*)buf);
+    //mbedtls_printf(" %lu bytes written\n\n%s", sizeof(data), (char*)data);
+    system("mkdir -p models");*/
 
     /* client receives response from server */
-    mbedtls_printf("[+]  < Read from server:");
+    mbedtls_printf("\n\n[+]  < Read from server:");
     fflush(stdout);
 
     do {
@@ -358,6 +408,23 @@ int main(int argc, char** argv) {
         len = ret;
         mbedtls_printf(" %lu bytes read\n\n%s", len, (char*)buf);
     } while (1);
+
+    /*mbedtls_printf("[+]  > Send link to download labels.txt to server:");
+    fflush(stdout);
+
+    len = sprintf((char*)buf, CURL_REQUEST2);
+    mbedtls_printf("\r\n\r\n");
+
+    while ((ret = mbedtls_ssl_write(&ssl, buf, len)) <= 0) {
+        if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
+            mbedtls_printf("[-] failed\n  ! mbedtls_ssl_write returned %d\n\n", ret);
+            goto exit;
+        }
+    }
+
+    len = ret;
+    mbedtls_printf(" %lu bytes written\n\n%s", len, (char*)buf);*/
+
 
     /* once the handshake success, the socket will be closed */
     mbedtls_ssl_close_notify(&ssl);

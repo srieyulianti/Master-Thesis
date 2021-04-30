@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <curl/curl.h>
 
 /* print library include */
 #define mbedtls_fprintf fprintf
@@ -54,11 +55,12 @@ int (*ra_tls_create_key_and_crt_f)(mbedtls_pk_context* key, mbedtls_x509_crt* cr
 #define HTTP_RESPONSE                                    \
     "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n" \
     "<h2>mbed TLS Test Server</h2>\r\n"                  \
-    "<p>Successful connection using: %s</p>\r\n"
+	"<h2>Connection to the link succeed</h2>\r\n"	\
+    "<p>Successful connection with the client using: %s</p>\r\n"
 
 #define DEBUG_LEVEL 0
-
-#define MALICIOUS_STR "MALICIOUS DATA"
+#define false 0
+#define SIZE 4096
 
 /* declare debug function */
 static void my_debug(void* ctx, int level, const char* file, int line, const char* str) {
@@ -66,6 +68,55 @@ static void my_debug(void* ctx, int level, const char* file, int line, const cha
     mbedtls_fprintf((FILE*)ctx, "%s:%04d: %s\n", file, line, str);
     fflush((FILE*)ctx);
 }
+
+/* declare curl function to download model */
+/*size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream){
+	size_t written;
+	written = fwrite(ptr, size, nmemb, stream);
+	return written;
+}
+
+int curl_download_tflite(char *link){
+	CURL *curl;
+	FILE *fp;
+	CURLcode res;
+
+	char url = link;
+	char outfilename[FILENAME_MAX] = "host/model.tgz";
+
+	curl_version_info_data * vinfo = curl_version_info(CURLVERSION_NOW);
+
+	if(vinfo->features & CURL_VERSION_SSL){
+		printf("CURL: SSL enabled\n");
+	}else{
+		printf("CURL: SSL not enabled\n");
+	}
+
+	curl = curl_easy_init();
+	if(curl){
+		fp = fopen(outfilename, "wb");*/
+		
+		/* setup the https:// verification options. */
+		/*curl_easy_setopt(curl, CURLOPT_URL, url);
+		curl_easy_setopt(curl, CURLOPT_CAINFO, "image/etc/ca-certificates.crt");
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, false);
+
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+		res = curl_easy_perform(curl);
+		curl_easy_cleanup(curl);
+
+		int i = fclose(fp);
+		if(i == 0)
+			system("rm -rf host/models");
+			system("mkdir -p host/models");
+			system("tar -xf host/model.tgz -C host/models");
+	}
+	return 0;
+}*/
+
 
 /* main function declaration */
 int main(void) {
@@ -78,6 +129,7 @@ int main(void) {
 
     void* ra_tls_attest_lib     = NULL;
     ra_tls_create_key_and_crt_f = NULL;
+    FILE *fp;
 
     mbedtls_entropy_context entropy;
     mbedtls_ctr_drbg_context ctr_drbg;
@@ -219,10 +271,84 @@ reset:
     mbedtls_printf("[+] OK\n");
     mbedtls_printf("[+] Handshake has been performed successfully...\n\n");
 
-    mbedtls_printf("[+]  < Read from client:");
+    /********************************** MODEL RECEPTION *************************************/
+    mbedtls_printf("[+]  < Get model from client:");
     fflush(stdout);
 
-    do {
+    /* Get Model Size */
+    int size;
+    ret = mbedtls_ssl_read(&ssl, &size, sizeof(int));
+    mbedtls_printf("\n[+] The model size is: %d\n", size);
+
+    if (ret <= 0) {
+	    switch (ret) {
+		    case MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY:
+			    mbedtls_printf(" connection was closed gracefully\n");
+			    break;
+		    
+		    case MBEDTLS_ERR_NET_CONN_RESET:
+			    mbedtls_printf(" connection was reset by peer\n");
+			    break;
+		    default:
+			    mbedtls_printf(" mbedtls_ssl_read returned -0x%x\n", -ret);
+			    break;
+	    }
+    }
+
+    /* Read model as byte array */
+    mbedtls_printf("[+] Reading model byte array...\n");
+    //{
+    	/*char model_array[size];
+	char* current = model_array;
+	int nb = mbedtls_ssl_read(&ssl, current, size);
+	while (nb >= 0){
+		current = current + nb;
+		nb = mbedtls_ssl_read(&ssl, current, size);
+	}*/
+
+	/*char model_array[size];
+	mbedtls_ssl_read(&ssl, model_array, size);
+	FILE *tflite_model = fopen("host/model.tflite", "w");
+        fwrite(model_array, 1, sizeof(model_array), tflite_model);
+        fclose(tflite_model);
+        mbedtls_printf("[+] Successfully converting byte to model...\n");*/
+
+    //}
+
+	/*ret = mbedtls_ssl_read(&ssl, model_array, sizeof(model_array));
+	if (ret <= 0) {
+		switch (ret) {
+                    	case MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY:
+                            	mbedtls_printf(" connection was closed gracefully\n");
+                           	break;
+
+                    	case MBEDTLS_ERR_NET_CONN_RESET:
+                            	mbedtls_printf(" connection was reset by peer\n");
+                            	break;
+                    	default:
+                            	mbedtls_printf(" mbedtls_ssl_read returned -0x%x\n", -ret);
+                            	break;
+            	}
+    	}*/
+
+    	/* Convert it back to the original model */
+    {
+        mbedtls_printf("[+] Converting byte array to model...\n");
+    	char model_array[SIZE];
+	FILE *tflite_model = fopen("host/model.tflite", "w");
+	int nb = mbedtls_ssl_read(&ssl, model_array, (SIZE-1));
+	while (nb > 0){
+		fwrite(model_array, 1, nb, tflite_model);
+		nb = mbedtls_ssl_read(&ssl, model_array, (SIZE-1));
+	}
+	fflush(tflite_model);
+	fclose(tflite_model);
+    	mbedtls_printf("[+] Successfully converting byte to model...\n");
+    }
+
+
+
+    /*do {
         len = sizeof(buf) - 1;
         memset(buf, 0, sizeof(buf));
         ret = mbedtls_ssl_read(&ssl, buf, len);
@@ -253,9 +379,20 @@ reset:
 
         if (ret > 0)
             break;
-    } while (1);
+    } while (1);*/
 
-    mbedtls_printf("[+]  > Write to client:");
+    /*fp = fopen("host/api.txt", "wb");
+    fwrite(buf, sizeof(buf), 1, fp);
+    fclose(fp);*/
+
+    /* Call curl function to download tflite */
+    //curl_download_tflite(buf);
+    ///system("mkdir -p models");
+    //system("curl buf | tar xzv -C host/models");
+	
+    
+    /* Send response to client */
+    mbedtls_printf("\n\n[+]  > Write to client:");
     fflush(stdout);
 
     len = sprintf((char*)buf, HTTP_RESPONSE, mbedtls_ssl_get_ciphersuite(&ssl));
