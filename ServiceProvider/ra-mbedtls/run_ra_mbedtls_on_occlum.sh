@@ -29,11 +29,10 @@ cp /etc/nsswitch.conf image/etc
 cp /etc/resolv.conf image/etc
 cp /etc/host.conf image/etc
 cp /etc/group image/etc
-#cp /etc/ethers image/etc
+cp /etc/ssl/certs/ca-certificates.crt image/etc
 cp /etc/hosts image/etc
 cp /etc/passwd image/etc
 cp /etc/gai.conf image/etc
-
 
 mkdir -p image/opt/occlum/glibc/etc
 cp /etc/ld.so.cache image/opt/occlum/glibc/etc

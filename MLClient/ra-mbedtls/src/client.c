@@ -66,12 +66,8 @@ void (*ra_tls_set_measurement_callback_f)(int (*f_cb)(const char* mrenclave, con
 /* Server environment definition */
 #define SERVER_PORT "8081"
 #define SERVER_NAME "server"
-/*#define GET_REQUEST "GET / HTTP/1.0\r\n\r\n"*/
-#define CURL_REQUEST1 "https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_2018_02_22/mobilenet_v1_1.0_224.tgz"
-#define CURL_REQUEST2 "https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_1.0_224_frozen.tgz"
 
-#define SIZE 4096
-
+#define SIZE 1024
 #define DEBUG_LEVEL 0
 
 /* Debug function */
@@ -107,7 +103,7 @@ static bool g_verify_mrsigner    = false;
 static bool g_verify_isv_prod_id = false;
 static bool g_verify_isv_svn     = false;
 
-/**************************** MAIN FUNCTION ***********************************/
+/************************************* MAIN FUNCTION ****************************************/
 
 int main(int argc, char** argv) {
     int ret;
@@ -241,7 +237,7 @@ int main(int argc, char** argv) {
 
     mbedtls_printf("[+] OK\n");
 
-    /* mbedtl loading CA certificate if any. However in this case, certificate verification callback
+    /* mbedtls loading CA certificate if any. However in this case, certificate verification callback
      * will be used instead of CA certificate loading
      */
     mbedtls_printf("[+] Loading the CA root certificate ...\n");
@@ -322,66 +318,34 @@ int main(int argc, char** argv) {
     fflush(stdout);
 
     /***************************** MODEL DEFINITION AND SUBMITION ********************************/
-    /* Get Model Size */
-    FILE *model;
-    model = fopen("../models/mobilenet_v1_1.0_224.tflite", "r");
-    int size;
-    fseek(model, 0, SEEK_END);
-    size = ftell(model);
-    fseek(model, 0, SEEK_SET);
-
-    /* Send Model Size */
-    mbedtls_printf("[+] Sending model size...\n");
-    if((ret = mbedtls_ssl_write(&ssl, &size, sizeof(size))) <= 0){
-	    if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
-		    mbedtls_printf("[-] failed\n  ! mbedtls_ssl_write returned %d\n\n", ret);
-		    goto exit;
-	    }
-    }
-    mbedtls_printf("[+] The model size is: %d\n", size);
-
-
-
-    /* Send Model as Byte Array */
-    mbedtls_printf("[+] Sending model as a byte array...\n");
+    /* Send file to Server */
     {
-    	char send_buffer[SIZE];
-    	int nb = fread(send_buffer, 1, sizeof(send_buffer), model);
-    	while(!feof(model)){
-	    	mbedtls_ssl_write(&ssl, send_buffer, nb);
-	    	nb = fread(send_buffer, 1, sizeof(send_buffer), model);
-    	}
-
-	/*char send_buffer[size];
-
-	while(!feof(model)){
-		fread(send_buffer, 1, sizeof(send_buffer), model);
-		mbedtls_ssl_write(&ssl, send_buffer, sizeof(send_buffer));
-		bzero(send_buffer, sizeof(send_buffer));
-	}*/
+	    char* filename = "../models/mobilenet_v1_1.0_224.tflite";
+	    char sendbuffer[SIZE];
+	    mbedtls_printf("[+] Client sending %s to the Server...\n", filename);
+	    FILE *fp = fopen(filename, "r");
+	    if (fp == NULL)
+	    {
+		    mbedtls_printf("[-] ERROR: File %s not found.\n", filename);
+		    exit(1);
+	    }
+	    bzero (sendbuffer, SIZE);
+	    int fp_block_sz;
+	    while ((fp_block_sz = fread(sendbuffer, sizeof(char), SIZE, fp)) > 0)
+	    {
+		    if (mbedtls_ssl_write(&ssl, sendbuffer, fp_block_sz) < 0)
+		    {
+			    mbedtls_fprintf(stderr, "[-] ERROR: Failed to send model %s. (errno = %d)\n", filename, errno);
+			    break;
+		    }
+		    bzero (sendbuffer, SIZE);
+	    }
+	    mbedtls_printf ("[+] OK\n");
+	    mbedtls_printf ("[+] Model %s from Client was sent successfully!\n", filename);
     }
-    mbedtls_printf("[+] The model is successfully submitted...\n");
-
-
-
-    /*len = sprintf((char*)buf, CURL_REQUEST1);
-    mbedtls_printf("Len size:%d", len);
-    mbedtls_printf("\r\n\r\n");
-
-    while ((ret = mbedtls_ssl_write(&ssl, buf, len)) <= 0) {
-        if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
-            mbedtls_printf("[-] failed\n  ! mbedtls_ssl_write returned %d\n\n", ret);
-            goto exit;
-        }
-    }
-
-    len = ret;
-    mbedtls_printf(" %lu bytes written\n\n%s", len, (char*)buf);
-    //mbedtls_printf(" %lu bytes written\n\n%s", sizeof(data), (char*)data);
-    system("mkdir -p models");*/
-
-    /* client receives response from server */
-    mbedtls_printf("\n\n[+]  < Read from server:");
+    
+    /* Receive response from server */
+    mbedtls_printf("\n\n[+]  < Read from server:\n");
     fflush(stdout);
 
     do {
@@ -396,7 +360,14 @@ int main(int argc, char** argv) {
             break;
 
         if (ret < 0) {
-            mbedtls_printf("[-] failed\n  ! mbedtls_ssl_read returned %d\n\n", ret);
+            //mbedtls_printf("[-] failed\n  ! mbedtls_ssl_read returned %d\n\n", ret);
+	    if (errno == EAGAIN)
+	    {
+		    mbedtls_printf(" read() timed out.\n");
+	    }else
+	    {
+		    mbedtls_fprintf(stderr, "read() failed due to errno = %d\n", errno);
+	    }
             break;
         }
 
@@ -409,26 +380,11 @@ int main(int argc, char** argv) {
         mbedtls_printf(" %lu bytes read\n\n%s", len, (char*)buf);
     } while (1);
 
-    /*mbedtls_printf("[+]  > Send link to download labels.txt to server:");
-    fflush(stdout);
-
-    len = sprintf((char*)buf, CURL_REQUEST2);
-    mbedtls_printf("\r\n\r\n");
-
-    while ((ret = mbedtls_ssl_write(&ssl, buf, len)) <= 0) {
-        if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
-            mbedtls_printf("[-] failed\n  ! mbedtls_ssl_write returned %d\n\n", ret);
-            goto exit;
-        }
-    }
-
-    len = ret;
-    mbedtls_printf(" %lu bytes written\n\n%s", len, (char*)buf);*/
-
-
+    
     /* once the handshake success, the socket will be closed */
     mbedtls_ssl_close_notify(&ssl);
     exit_code = MBEDTLS_EXIT_SUCCESS;
+    mbedtls_printf("[+] Connection is closed by server...\n");
 exit:
 #ifdef MBEDTLS_ERROR_C
     if (exit_code != MBEDTLS_EXIT_SUCCESS) {
