@@ -318,7 +318,7 @@ int main(int argc, char** argv) {
     fflush(stdout);
 
     /***************************** MODEL DEFINITION AND SUBMITION ********************************/
-    /* Send file to Server */
+    /* Send tflite model to Server */
     {
 	    char* filename = "../models/mobilenet_v1_1.0_224.tflite";
 	    char sendbuffer[SIZE];
@@ -343,7 +343,35 @@ int main(int argc, char** argv) {
 	    mbedtls_printf ("[+] OK\n");
 	    mbedtls_printf ("[+] Model %s from Client was sent successfully!\n", filename);
     }
-    
+
+    /******************************* SEND LABEL TEXT FOR MODEL PARAMETERS ******************************/
+    /* Send label text for the model to Server */
+    {
+            char* file2 = "../models/labels.txt";
+            char sendbuf[SIZE];
+            mbedtls_printf("[+] Client sending %s to the Server...\n", file2);
+            FILE *label = fopen(file2, "r");
+            if (label == NULL)
+            {
+                    mbedtls_printf("[-] ERROR: File %s not found.\n", file2);
+                    exit(1);
+            }
+            bzero (sendbuf, SIZE);
+            int label_block_sz;
+            while ((label_block_sz = fread(sendbuf, sizeof(char), SIZE, label)) > 0)
+            {
+                    if (mbedtls_ssl_write(&ssl, sendbuf, label_block_sz) < 0)
+                    {
+                            mbedtls_fprintf(stderr, "[-] ERROR: Failed to send model %s. (errno = %d)\n", file2, errno);
+                            break;
+                    }
+                    bzero (sendbuf, SIZE);
+            }
+            mbedtls_printf ("[+] OK\n");
+            mbedtls_printf ("[+] Labels %s from Client was sent successfully!\n", file2);
+    }
+
+    /*********************************** WAITING RESPONSE FROM SERVER **************************************/    
     /* Receive response from server */
     mbedtls_printf("\n\n[+]  < Read from server:\n");
     fflush(stdout);
@@ -380,7 +408,7 @@ int main(int argc, char** argv) {
         mbedtls_printf(" %lu bytes read\n\n%s", len, (char*)buf);
     } while (1);
 
-    
+    /************************************ CONNECTION TERMINATION ****************************************/
     /* once the handshake success, the socket will be closed */
     mbedtls_ssl_close_notify(&ssl);
     exit_code = MBEDTLS_EXIT_SUCCESS;

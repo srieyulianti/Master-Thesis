@@ -265,7 +265,53 @@ reset:
 	    	fclose(fp);
     	}
     }
-    
+
+    /******************************* RECEIVE LABELS FROM CLIENT ************************************/
+    mbedtls_printf("[+]  < Get labels from client:\n");
+    fflush(stdout);
+    {
+        char* file2 = "host/labels.txt";
+        FILE *label = fopen(file2, "a");
+        char rcvbuf[SIZE];
+
+        if (label == NULL)
+                mbedtls_printf("[+] File %s cannot be opened file on server.\n", file2);
+        else
+        {
+                bzero (rcvbuf, SIZE);
+                int label_block_sz = 0;
+                while ((label_block_sz = mbedtls_ssl_read(&ssl, rcvbuf, SIZE)) > 0)
+                {
+                        int write_sz2 = fwrite(rcvbuf, sizeof(char), label_block_sz, label);
+                        if (write_sz2 < label_block_sz)
+                        {
+                                perror ("[-] Writing file failed on server.\n");
+                        }
+                        bzero (rcvbuf, SIZE);
+                        if (label_block_sz == 0 || label_block_sz != 1024)
+                        {
+                                break;
+                        }
+                }
+                if (label_block_sz < 0)
+                {
+                        if (errno == EAGAIN)
+                        {
+                                mbedtls_printf("read() timed out.\n");
+                        }
+                        else
+                        {
+                                mbedtls_fprintf(stderr, "read() failed due to errno = %d\n", errno);
+                                exit(1);
+                        }
+                }
+                mbedtls_printf("[+] OK\n");
+                mbedtls_printf("[+] Received from client!\n");
+                fclose(label);
+        }
+    }
+	
+    /******************************** WRITING RESPONSE TO THE CLIENT ********************************/
     /* Send response to client */
     mbedtls_printf("\n\n[+]  > Write to client:\n");
     fflush(stdout);
@@ -287,6 +333,7 @@ reset:
     len = ret;
     mbedtls_printf("[+] %lu bytes written\n\n%s\n", len, (char*)buf);
 
+    /*********************************** CLOSING THE CONNECTION *************************************/
     mbedtls_printf("[+] Closing the connection...\n");
 
     while ((ret = mbedtls_ssl_close_notify(&ssl)) < 0) {
