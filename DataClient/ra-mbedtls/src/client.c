@@ -66,9 +66,8 @@ void (*ra_tls_set_measurement_callback_f)(int (*f_cb)(const char* mrenclave, con
 /* Server environment definition */
 #define SERVER_PORT "8081"
 #define SERVER_NAME "server"
-#define GET_REQUEST "GET / HTTP/1.0\r\n\r\n"
-#define CURL_REQUEST "curl https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_2018_02_22/mobilenet_v1_1.0_224.tgz\r\n\r\n"
 
+#define SIZE 1024
 #define DEBUG_LEVEL 0
 
 /* Debug function */
@@ -315,23 +314,39 @@ int main(int argc, char** argv) {
      * a message or writing the buffer to the server
      */
     mbedtls_printf("[+] Handshake has been performed successfully...\n\n");
-    mbedtls_printf("[+]  > Write to server:");
+    mbedtls_printf("[+]  > Send the data to server:");
     fflush(stdout);
 
-    len = sprintf((char*)buf, CURL_REQUEST);
-
-    while ((ret = mbedtls_ssl_write(&ssl, buf, len)) <= 0) {
-        if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
-            mbedtls_printf("[-] failed\n  ! mbedtls_ssl_write returned %d\n\n", ret);
-            goto exit;
-        }
+    /******************************** DATA SUBMISSION ***********************************/
+    /* Send tflite model to Server */
+    {
+            char* filename = "../testdata/grace_hopper.bmp";
+            char sendbuffer[SIZE];
+            mbedtls_printf("[+] Client sending %s to the Server...\n", filename);
+            FILE *fp = fopen(filename, "r");
+            if (fp == NULL)
+            {
+                    mbedtls_printf("[-] ERROR: File %s not found.\n", filename);
+                    exit(1);
+            }
+            bzero (sendbuffer, SIZE);
+            int fp_block_sz;
+            while ((fp_block_sz = fread(sendbuffer, sizeof(char), SIZE, fp)) > 0)
+            {
+                    if (mbedtls_ssl_write(&ssl, sendbuffer, fp_block_sz) < 0)
+                    {
+                            mbedtls_fprintf(stderr, "[-] ERROR: Failed to send model %s. (errno = %d)\n", filename, errno);
+                            break;
+                    }
+                    bzero (sendbuffer, SIZE);
+            }
+            mbedtls_printf ("[+] OK\n");
+            mbedtls_printf ("[+] Data %s from Client was sent successfully!\n", filename);
     }
 
-    len = ret;
-    mbedtls_printf(" %lu bytes written\n\n%s", len, (char*)buf);
-
-    /* client receives response from server */
-    mbedtls_printf("[+]  < Read from server:");
+    /*********************************** WAITING RESPONSE FROM SERVER **************************************/
+    /* Receive response from server */
+    mbedtls_printf("\n\n[+]  < Read from server:\n");
     fflush(stdout);
 
     do {
@@ -346,7 +361,14 @@ int main(int argc, char** argv) {
             break;
 
         if (ret < 0) {
-            mbedtls_printf("[-] failed\n  ! mbedtls_ssl_read returned %d\n\n", ret);
+            //mbedtls_printf("[-] failed\n  ! mbedtls_ssl_read returned %d\n\n", ret);
+            if (errno == EAGAIN)
+            {
+                    mbedtls_printf(" read() timed out.\n");
+            }else
+            {
+                    mbedtls_fprintf(stderr, "read() failed due to errno = %d\n", errno);
+            }
             break;
         }
 
@@ -355,13 +377,15 @@ int main(int argc, char** argv) {
             break;
         }
 
-        len = ret;
+	len = ret;
         mbedtls_printf(" %lu bytes read\n\n%s", len, (char*)buf);
     } while (1);
 
+    /************************************ CONNECTION TERMINATION ****************************************/
     /* once the handshake success, the socket will be closed */
     mbedtls_ssl_close_notify(&ssl);
     exit_code = MBEDTLS_EXIT_SUCCESS;
+    mbedtls_printf("[+] Connection is closed by server...\n");
 exit:
 #ifdef MBEDTLS_ERROR_C
     if (exit_code != MBEDTLS_EXIT_SUCCESS) {

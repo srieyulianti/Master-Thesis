@@ -195,7 +195,7 @@ reset:
 
     mbedtls_ssl_session_reset(&ssl);
 
-    mbedtls_printf("[+] Waiting for a remote connection ...\n");
+    mbedtls_printf("[+] Waiting for a remote connection from model client...\n");
     fflush(stdout);
 
     ret = mbedtls_net_accept(&listen_fd, &client_fd, NULL, 0, NULL);
@@ -334,7 +334,129 @@ reset:
     mbedtls_printf("[+] %lu bytes written\n\n%s\n", len, (char*)buf);
 
     /*********************************** CLOSING THE CONNECTION *************************************/
-    mbedtls_printf("[+] Closing the connection...\n");
+    mbedtls_printf("[+] Closing the connection with the model owner...\n");
+
+    while ((ret = mbedtls_ssl_close_notify(&ssl)) < 0) {
+        if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
+            mbedtls_printf("[-] failed\n  ! mbedtls_ssl_close_notify returned %d\n\n", ret);
+            goto exit;
+        }
+    }
+
+    mbedtls_printf("[+] OK\n");
+
+    ret = 0;
+    goto next_conn;
+
+    /*************************** WAITING NEXT CONNECTION FROM DATA CLIENT ***************************/
+next_conn:
+#ifdef MBEDTLS_ERROR_C
+    if (ret != 0) {
+        char error_buf[100];
+        mbedtls_strerror(ret, error_buf, sizeof(error_buf));
+        mbedtls_printf("Last error was: %d - %s\n\n", ret, error_buf);
+    }
+#endif
+
+    mbedtls_net_free(&client_fd);
+
+    mbedtls_ssl_session_reset(&ssl);
+
+    mbedtls_printf("[+] Waiting for a remote connection from data client...\n");
+    fflush(stdout);
+
+    ret = mbedtls_net_accept(&listen_fd, &client_fd, NULL, 0, NULL);
+    if (ret != 0) {
+        mbedtls_printf("[-] failed\n  ! mbedtls_net_accept returned %d\n\n", ret);
+        goto exit;
+    }
+
+    mbedtls_ssl_set_bio(&ssl, &client_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
+
+    mbedtls_printf("[+] OK\n");
+
+    mbedtls_printf("[+] Performing the SSL/TLS handshake...\n");
+    fflush(stdout);
+
+    while ((ret = mbedtls_ssl_handshake(&ssl)) != 0) {
+        if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
+            mbedtls_printf("[-] failed\n  ! mbedtls_ssl_handshake returned %d\n\n", ret);
+            goto exit;
+        }
+    }
+
+    mbedtls_printf("[+] OK\n");
+    mbedtls_printf("[+] Handshake has been performed successfully...\n\n");
+
+    /********************************** RECEIVE DATA FROM CLIENT *************************************/
+    mbedtls_printf("[+]  < Get data from client:\n");
+    fflush(stdout);
+    {
+        char* filename = "host/image.bmp";
+        FILE *fp = fopen(filename, "a");
+        char rcvbuffer[SIZE];
+
+        if (fp == NULL)
+                mbedtls_printf("[+] File %s cannot be opened file on server.\n", filename);
+        else
+        {
+                bzero (rcvbuffer, SIZE);
+                int fp_block_sz = 0;
+                while ((fp_block_sz = mbedtls_ssl_read(&ssl, rcvbuffer, SIZE)) > 0)
+                {
+                        int write_sz = fwrite(rcvbuffer, sizeof(char), fp_block_sz, fp);
+                        if (write_sz < fp_block_sz)
+                        {
+                                perror ("[-] Writing file failed on server.\n");
+                        }
+                        bzero (rcvbuffer, SIZE);
+                        if (fp_block_sz == 0 || fp_block_sz != 1024)
+                        {
+                                break;
+                        }
+                }
+		if (fp_block_sz < 0)
+                {
+                        if (errno == EAGAIN)
+                        {
+                                mbedtls_printf("read() timed out.\n");
+                        }
+                        else
+                        {
+                                mbedtls_fprintf(stderr, "read() failed due to errno = %d\n", errno);
+                                exit(1);
+                        }
+                }
+                mbedtls_printf("[+] OK\n");
+                mbedtls_printf("[+] Received from client!\n");
+                fclose(fp);
+        }
+    }
+
+    /******************************** WRITING RESPONSE TO THE CLIENT ********************************/
+    /* Send response to client */
+    mbedtls_printf("\n\n[+]  > Write to client:\n");
+    fflush(stdout);
+
+    len = sprintf((char*)buf, HTTP_RESPONSE, mbedtls_ssl_get_ciphersuite(&ssl));
+
+    while ((ret = mbedtls_ssl_write(&ssl, buf, len)) <= 0) {
+        if (ret == MBEDTLS_ERR_NET_CONN_RESET) {
+            mbedtls_printf("[-] failed\n  ! peer closed the connection\n\n");
+            goto exit;
+        }
+
+        if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
+            mbedtls_printf("[-] failed\n  ! mbedtls_ssl_write returned %d\n\n", ret);
+            goto exit;
+        }
+    }
+
+    len = ret;
+    mbedtls_printf("[+] %lu bytes written\n\n%s\n", len, (char*)buf);
+
+    /*********************************** CLOSING THE CONNECTION *************************************/
+    mbedtls_printf("[+] Closing the connection with the data client...\n");
 
     while ((ret = mbedtls_ssl_close_notify(&ssl)) < 0) {
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
