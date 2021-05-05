@@ -35,6 +35,8 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <curl/curl.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 /* print library include */
 #define mbedtls_fprintf fprintf
@@ -49,6 +51,8 @@
 #include <mbedtls/net_sockets.h>
 #include <mbedtls/ssl.h>
 #include <mbedtls/x509.h>
+
+#include "tensorflow/lite/c/c_api.h"
 
 /* RA-TLS: on server, only need ra_tls_create_key_and_crt() to create keypair and X.509 cert */
 int (*ra_tls_create_key_and_crt_f)(mbedtls_pk_context* key, mbedtls_x509_crt* crt);
@@ -225,7 +229,7 @@ reset:
     mbedtls_printf("[+]  < Get model from client:\n");
     fflush(stdout);
     {
-    	char* filename = "host/model.tflite";
+    	char* filename = "host/mobilenet_v1_1.0_224.tflite";
     	FILE *fp = fopen(filename, "a");
     	char rcvbuffer[SIZE];
 
@@ -432,6 +436,10 @@ next_conn:
                 fclose(fp);
         }
     }
+
+    /*********************************** RUNNING THE APPLICATION ************************************/
+
+    
 
     /******************************** WRITING RESPONSE TO THE CLIENT ********************************/
     /* Send response to client */

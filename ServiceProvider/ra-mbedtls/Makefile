@@ -6,9 +6,11 @@ INC_PATH := include
 SCRIPT_PATH := scripts
 SGX_SDK_INC_PATH := /opt/intel/sgxsdk/include
 MBEDTLS_PATH := mbedtls/include
+TFLOW_PATH := tensorflow_src
+TENSORFLOW_PATH := tensorflow_src/bazel-bin/tensorflow/lite/c
 
 CC := gcc
-CCFLAGS := -I$(INC_PATH) -I$(SGX_SDK_INC_PATH) -I$(MBEDTLS_PATH) -fPIC
+CCFLAGS := -I$(INC_PATH) -I$(SGX_SDK_INC_PATH) -I$(MBEDTLS_PATH) -I$(TFLOW_PATH) -fPIC
 CCOBJFLAGS := $(CCFLAGS) -c
 
 TARGET_NAME := ra-tls-server
@@ -72,7 +74,7 @@ $(LIB_PATH)/.mbedtls_libs_copied: mbedtls/.mbedtls_built
 ############################ RA-TLS-SERVER DEPENDENCY ###########################
 
 LDFLAGS += -Lmbedtls/install/lib
-LFLAGS += -Wl,-ldl   
+LFLAGS += -Wl,-ldl -lcurl   
 
 $(OBJ_PATH)/quote_generation.o: $(SRC_PATH)/quote_generation.c
 	@echo $(CC) $(CCOBJFLAGS) $< -o $@
@@ -94,7 +96,11 @@ $(OBJ_PATH)/server.o: $(SRC_PATH)/server.c $(LIB_PATH)/libra_tls_attest.so
 	$(CC) $(CCOBJFLAGS) $< -o $@
 	@echo "CC <= $<"
 
-$(TARGET): $(OBJ_PATH)/server.o $(LIB_PATH)/libmbedcrypto.so $(LIB_PATH)/libmbedtls.so $(LIB_PATH)/libmbedx509.so 
+$(LIB_PATH)/libtensorflowlite_c.so:
+	cp -f $(TENSORFLOW_PATH)/libtensorflowlite_c.so $@
+	@echo "Copy libtensorflowlite_c.so to lib directory"
+
+$(TARGET): $(OBJ_PATH)/server.o $(LIB_PATH)/libmbedcrypto.so $(LIB_PATH)/libmbedtls.so $(LIB_PATH)/libmbedx509.so $(LIB_PATH)/libtensorflowlite_c.so
 	@echo $(CC) $^ -o $@ $(LFLAGS)
 	$(CC) $^ -o $@ $(LFLAGS)
 	@echo "CC <= $^"
@@ -102,3 +108,5 @@ $(TARGET): $(OBJ_PATH)/server.o $(LIB_PATH)/libmbedcrypto.so $(LIB_PATH)/libmbed
 
 clean:
 	@rm -rf $(CLEAN_LIST)
+
+
