@@ -1,5 +1,6 @@
 #include "ObjectDetector.h"
 #include <opencv2/imgproc.hpp>
+/*#include "tensorflow/lite/c/c_api.h"*/
 
 
 using namespace cv;
@@ -58,20 +59,20 @@ void ObjectDetector::initDetectionModel(const char *tfliteModel, long modelSize)
 	}
 
 	m_input_tensor = TfLiteInterpreterGetInputTensor(m_interpreter, 0);
-	if (m_modelQuantized && m_input_tensor->type != kTfLiteUInt8) {
+	if (m_modelQuantized && TfLiteTensorType(m_input_tensor) != kTfLiteUInt8) {
 		printf("Detection model input should be kTfLiteUInt8!");
 		return;
 	}
 
-	if (!m_modelQuantized && m_input_tensor->type != kTfLiteFloat32) {
+	if (!m_modelQuantized && TfLiteTensorType(m_input_tensor) != kTfLiteFloat32) {
 		printf("Detection model input should be kTfLiteFloat32!");
 		return;
 	}
 
-	if (m_input_tensor->dims->data[0] != 1 ||
-		m_input_tensor->dims->data[1] != DETECTION_MODEL_SIZE ||
-		m_input_tensor->dims->data[2] != DETECTION_MODEL_SIZE ||
-		m_input_tensor->dims->data[3] != DETECTION_MODEL_CNLS) {
+	if (TfLiteTensorDim(m_input_tensor, 0) != 1 ||
+		TfLiteTensorDim(m_input_tensor, 1) != DETECTION_MODEL_SIZE ||
+		TfLiteTensorDim(m_input_tensor, 2) != DETECTION_MODEL_SIZE ||
+		TfLiteTensorDim(m_input_tensor, 3) != DETECTION_MODEL_CNLS) {
 		printf("Detection model must have input dims of 1x%ix%ix%i", DETECTION_MODEL_SIZE,
 			   DETECTION_MODEL_SIZE, DETECTION_MODEL_CNLS);
 		return;
@@ -108,9 +109,12 @@ DetectResult* ObjectDetector::detect(Mat src) {
 		cvtColor(image, image, COLOR_BGRA2RGB);
 	}
 
+	void* TensorData = TfLiteTensorData(m_input_tensor);
 	if (m_modelQuantized) {
 		// Copy image into input tensor
-		uchar *dst = m_input_tensor->data.uint8;
+		//void* TensorData = TfLiteTensorData(m_input_tensor);
+		uchar *dst = (uchar*)TensorData;
+
 		memcpy(dst, image.data,
 			   sizeof(uchar) * DETECTION_MODEL_SIZE * DETECTION_MODEL_SIZE * DETECTION_MODEL_CNLS);
 	} else {
@@ -119,7 +123,7 @@ DetectResult* ObjectDetector::detect(Mat src) {
 		image.convertTo(fimage, CV_32FC3, 1 / IMAGE_STD, -IMAGE_MEAN / IMAGE_STD);
 
 		// Copy image into input tensor
-		float *dst = m_input_tensor->data.f;
+		float *dst = (float*)TensorData;
 		memcpy(dst, fimage.data,
 			   sizeof(float) * DETECTION_MODEL_SIZE * DETECTION_MODEL_SIZE * DETECTION_MODEL_CNLS);
 	}
@@ -128,11 +132,15 @@ DetectResult* ObjectDetector::detect(Mat src) {
 		printf("Error invoking detection model");
 		return res;
 	}
+	void* OutputLocation = TfLiteTensorData(m_output_locations);
+	void* OutputClasses = TfLiteTensorData(m_output_classes);
+	void* OutputScores = TfLiteTensorData(m_output_scores);
+	void* OutputNumDetections = TfLiteTensorData(m_num_detections);
 
-	const float *detection_locations = m_output_locations->data.f;
-	const float *detection_classes = m_output_classes->data.f;
-	const float *detection_scores = m_output_scores->data.f;
-	const int num_detections = (int) *m_num_detections->data.f;
+	const float *detection_locations = (float*)OutputLocation;
+	const float *detection_classes = (float*)OutputClasses;
+	const float *detection_scores = (float*)OutputScores;
+	const int num_detections = (int) *(float*)OutputNumDetections;
 
 	for (int i = 0; i < num_detections && i < DETECT_NUM; ++i) {
 		res[i].score = detection_scores[i];

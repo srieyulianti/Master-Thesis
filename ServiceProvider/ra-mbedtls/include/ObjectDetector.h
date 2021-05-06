@@ -28,14 +28,14 @@ private:
 	const float IMAGE_STD = 128.0;
 	bool m_modelQuantized = false;
 	bool m_hasDetectionModel = false;
-	char *m_modelBytes = nullptr;
+	char* m_modelBytes = nullptr;
 	TfLiteModel* m_model;
 	TfLiteInterpreter* m_interpreter;
-	TfLiteTensor *m_input_tensor = nullptr;
-	const TfLiteTensor *m_output_locations = nullptr;
-	const TfLiteTensor *m_output_classes = nullptr;
-	const TfLiteTensor *m_output_scores = nullptr;
-	const TfLiteTensor *m_num_detections = nullptr;
+	TfLiteTensor* m_input_tensor = nullptr;
+	const TfLiteTensor* m_output_locations = nullptr;
+	const TfLiteTensor* m_output_classes = nullptr;
+	const TfLiteTensor* m_output_scores = nullptr;
+	const TfLiteTensor* m_num_detections = nullptr;
 
 	// Methods
 	void initDetectionModel(const char *tfliteModel, long modelSize);
