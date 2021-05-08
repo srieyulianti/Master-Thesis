@@ -1,3 +1,6 @@
+#ifndef OBJECT_DETECTOR_H_
+#define OBJECT_DETECTOR_H_
+
 #include "tensorflow/lite/c/c_api.h"
 #include "tensorflow/lite/c/c_api_experimental.h"
 #include "tensorflow/lite/c/common.h"
@@ -10,3 +13,5 @@
 
 int disposeTfLiteObjects(TfLiteModel* m_Model, TfLiteInterpreter* m_Interpreter);
 int ObjectDetector(char* model_name, char* image_file);
+
+#endif //OBJECT_DETECTOR_H_ 

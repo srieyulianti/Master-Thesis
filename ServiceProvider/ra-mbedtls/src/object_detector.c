@@ -3,6 +3,7 @@
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/c/builtin_op_data.h"
 #include "tensorflow/lite/c/ujpeg.h"
+#include "object_detector.h"
 
 #include <stdio.h>
 #include <stdlib.h>
