@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <string.h>*/
 
+// Code Reference: https://quares.ru/?id=343207
+// Code Reference: https://cdmana.com/2021/01/20210107031229630z.html
 // Dispose of the model and interpreter objects.
 int disposeTfLiteObjects(TfLiteModel* m_Model, TfLiteInterpreter* m_Interpreter)
 {
