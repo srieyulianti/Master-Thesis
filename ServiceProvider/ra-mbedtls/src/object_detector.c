@@ -1,8 +1,8 @@
 /*#include "tensorflow/lite/c/c_api.h"
 #include "tensorflow/lite/c/c_api_experimental.h"
 #include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/c/builtin_op_data.h"
-#include "tensorflow/lite/c/ujpeg.h"*/
+#include "tensorflow/lite/c/builtin_op_data.h"*/
+#include "ujpeg.h"
 #include "object_detector.h"
 
 /*#include <stdio.h>
@@ -24,7 +24,7 @@ int disposeTfLiteObjects(TfLiteModel* m_Model, TfLiteInterpreter* m_Interpreter)
 }
 
 // The main function.
-int ObjectDetector(char* model_name, char* image_file) 
+int ObjectDetector(char* model_name, char* image_file, char buffer[1024]) 
 {
     TfLiteStatus tflStatus;
 
@@ -75,8 +75,7 @@ int ObjectDetector(char* model_name, char* image_file)
     // Log and exit in case of error.
     if(tflStatus != kTfLiteOk)
     {
-      printf("Error allocating tensors.
-");
+      printf("Error allocating tensors.");
       disposeTfLiteObjects(model, interpreter);
       return 1;
     }
@@ -87,8 +86,7 @@ int ObjectDetector(char* model_name, char* image_file)
     // Log and exit in case of error.
     if(tflStatus != kTfLiteOk)
     {
-      printf("Error resizing tensor.
-");
+      printf("Error resizing tensor.");
       disposeTfLiteObjects(model, interpreter);
       return 1;
     }
@@ -98,8 +96,7 @@ int ObjectDetector(char* model_name, char* image_file)
     // Log and exit in case of error.
     if(tflStatus != kTfLiteOk)
     {
-      printf("Error allocating tensors after resize.
-");
+      printf("Error allocating tensors after resize.");
       disposeTfLiteObjects(model, interpreter);
       return 1;
     }
@@ -108,14 +105,13 @@ int ObjectDetector(char* model_name, char* image_file)
     TfLiteTensor* inputTensor = TfLiteInterpreterGetInputTensor(interpreter, 0);
 
     // Copy the JPEG image data into into the input tensor.
-    tflStatus = TfLiteTensorCopyFromBuffer(inputTensor, imageDataBuffer, imageSize);
-    
+    tflStatus = TfLiteTensorCopyFromBuffer(inputTensor, imageDataBuffer, imageSize * sizeof(float));
+
     // Log and exit in case of error.
     // FIXME: Error occurs here.
     if(tflStatus != kTfLiteOk)
     {
-      printf("Error copying input from buffer.
-");
+      printf("Error copying input from buffer.");
       disposeTfLiteObjects(model, interpreter);
       return 1;
     }
@@ -126,8 +122,7 @@ int ObjectDetector(char* model_name, char* image_file)
     // Log and exit in case of error.
     if(tflStatus != kTfLiteOk)
     {
-      printf("Error invoking interpreter.
-");
+      printf("Error invoking interpreter.");
       disposeTfLiteObjects(model, interpreter);
       return 1;
     }
@@ -136,9 +131,24 @@ int ObjectDetector(char* model_name, char* image_file)
     const TfLiteTensor* outputTensor = TfLiteInterpreterGetOutputTensor(interpreter, 0);
 
     // There are three possible labels. Size the output accordingly.
-    float output[3];
+    float output[1001];
 
-    tflStatus = TfLiteTensorCopyToBuffer(outputTensor, output, 3 * sizeof(float));
+    tflStatus = TfLiteTensorCopyToBuffer(outputTensor, output, 1001 * sizeof(float));
+
+    float max_value = -1;
+    float max_idx = -1;
+    for (int i = 0; i < 1001; ++i){
+	   if (output[i] > max_value){
+		  max_value = output[i];
+		  max_idx = i;
+	   }
+    }
+    
+    //Mapping the category to a label tag
+    int ret = snprintf(buffer, 1024, "[+] Category: %.0f, probability: %f\n", max_idx, max_value);
+    if (ret<0) {
+	    return EXIT_FAILURE;
+    }
 
     // Log and exit in case of error.
     if(tflStatus != kTfLiteOk)
@@ -146,16 +156,13 @@ int ObjectDetector(char* model_name, char* image_file)
       printf("Error copying output to buffer.");
       disposeTfLiteObjects(model, interpreter);
       return 1;
-    }
-
-    // Print out classification result.
-    printf("Confidences: %f, %f, %f.", output[0], output[1], output[2]); 
+    } 
 
     // Dispose of the TensorFlow objects.
     disposeTfLiteObjects(model, interpreter);
     
-    // Dispoice of the image object.
+    // Dispose of the image object.
     ujFree(img);
-    
+
     return 0;
 }

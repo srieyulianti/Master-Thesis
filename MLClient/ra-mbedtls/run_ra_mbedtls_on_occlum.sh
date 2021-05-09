@@ -49,3 +49,6 @@ occlum build
 echo -e "${BLUE}occlum run /bin/ra-tls-client${NC}"
 occlum run /bin/ra-tls-client enclave
 
+cd ..
+make clean
+

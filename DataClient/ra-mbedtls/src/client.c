@@ -320,7 +320,7 @@ int main(int argc, char** argv) {
     /******************************** DATA SUBMISSION ***********************************/
     /* Send tflite model to Server */
     {
-            char* filename = "../testdata/grace_hopper.bmp";
+            char* filename = "../testdata/cat_224px.jpeg";
             char sendbuffer[SIZE];
             mbedtls_printf("[+] Client sending %s to the Server...\n", filename);
             FILE *fp = fopen(filename, "r");
@@ -346,7 +346,7 @@ int main(int argc, char** argv) {
 
     /*********************************** WAITING RESPONSE FROM SERVER **************************************/
     /* Receive response from server */
-    mbedtls_printf("\n\n[+]  < Read from server:\n");
+    mbedtls_printf("\n\n[+] Waiting the image classification result from server:\n");
     fflush(stdout);
 
     do {

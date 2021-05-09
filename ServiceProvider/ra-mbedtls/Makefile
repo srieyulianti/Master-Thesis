@@ -8,14 +8,9 @@ SGX_SDK_INC_PATH := /opt/intel/sgxsdk/include
 MBEDTLS_PATH := mbedtls/include
 TFLOW_PATH := tensorflow_src
 TENSORFLOW_PATH := tensorflow_src/bazel-bin/tensorflow/lite/c
-OPENCV_PATH := opencv_build/include
-OPENCV_BIN := opencv_build/bin
-OPENCV_LIB := Opencv_build/lib
-CXX_STDC_LIB := /usr/lib/x86_64-linux-gnu
 
 CC := gcc
-CXX := g++
-CCFLAGS := -I$(INC_PATH) -I$(SGX_SDK_INC_PATH) -I$(MBEDTLS_PATH) -I$(TFLOW_PATH) -I$(OPENCV_PATH) -fPIC
+CCFLAGS := -I$(INC_PATH) -I$(SGX_SDK_INC_PATH) -I$(MBEDTLS_PATH) -I$(TFLOW_PATH) -fPIC
 CCOBJFLAGS := $(CCFLAGS) -c
 
 TARGET_NAME := ra-tls-server
@@ -78,8 +73,8 @@ $(LIB_PATH)/.mbedtls_libs_copied: mbedtls/.mbedtls_built
 
 ############################ RA-TLS-SERVER DEPENDENCY ###########################
 
-LDFLAGS += -Lmbedtls/install/lib -L$(OPENCV_LIB) -L$(OPENCV_BIN) 
-LFLAGS += -Wl,-ldl -lstdc++ -lm -lpthread -ljpeg -lrt -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_highgui -lopencv_imgproc
+LDFLAGS += -Lmbedtls/install/lib  
+LFLAGS += -Wl,-ldl -lm -lpthread -ljpeg -lrt 
 
 $(OBJ_PATH)/quote_generation.o: $(SRC_PATH)/quote_generation.c
 	@echo $(CC) $(CCOBJFLAGS) $< -o $@
@@ -96,28 +91,28 @@ $(LIB_PATH)/libra_tls_attest.so: $(OBJ_PATH)/ra_tls_attest.o $(OBJ_PATH)/quote_g
 	$(CC) $^ $(LDFLAGS) -l:libmbedx509.a -l:libmbedcrypto.a -shared -o $@
 	@echo "CC <= $<"
 
-$(OBJ_PATH)/server.o: $(SRC_PATH)/server.c $(LIB_PATH)/libra_tls_attest.so
-	@echo $(CC) $(CCOBJFLAGS) $< -o $@
-	$(CC) $(CCOBJFLAGS) $< -o $@
-	@echo "CC <= $<"
-
 $(LIB_PATH)/libtensorflowlite_c.so:
 	cp -f $(TENSORFLOW_PATH)/libtensorflowlite_c.so $@
 	@echo "Copy libtensorflowlite_c.so to lib directory"
 
-$(OBJ_PATH)/ObjectDetector.o: $(SRC_PATH)/ObjectDetector.cpp $(LIB_PATH)/libtensorflowlite_c.so 
-	@echo $(CXX) $(CCOBJFLAGS) $< -o $@ $(LFLAGS)
-	$(CXX) $(CCOBJFLAGS) $< -o $@ $(LFLAGS)
+$(OBJ_PATH)/ujpeg.o: $(SRC_PATH)/ujpeg.c 
+	@echo $(CC) $(CCOBJFLAGS) $< -o $@ $(LFLAGS)
+	$(CC) $(CCOBJFLAGS) $< -o $@ $(LFLAGS)
 	@echo "CC <= $<"
 
-$(LIB_PATH)/libcppshared.so: $(OBJ_PATH)/ObjectDetector.o
-	@echo $(CXX) $^ $(LDFLAGS) -shared -o $@
-	$(CXX) $^ $(LDFLAGS) -shared -o $@
+$(OBJ_PATH)/object_detector.o: $(SRC_PATH)/object_detector.c $(LIB_PATH)/libtensorflowlite_c.so $(OBJ_PATH)/ujpeg.o
+	@echo $(CC) $(CCOBJFLAGS) $< -o $@ $(LFLAGS)
+	$(CC) $(CCOBJFLAGS) $< -o $@ $(LFLAGS)
 	@echo "CC <= $<"
 
-$(TARGET): $(OBJ_PATH)/server.o $(LIB_PATH)/libmbedcrypto.so $(LIB_PATH)/libmbedtls.so $(LIB_PATH)/libmbedx509.so $(LIB_PATH)/libtensorflowlite_c.so $(OBJ_PATH)/ObjectDetector.o $(LIB_PATH)/libcppshared.so
+$(OBJ_PATH)/server.o: $(SRC_PATH)/server.c $(LIB_PATH)/libra_tls_attest.so $(OBJ_PATH)/object_detector.o $(OBJ_PATH)/ujpeg.o
+	@echo $(CC) $(CCOBJFLAGS) $< -o $@ $(LFLAGS) 
+	$(CC) $(CCOBJFLAGS) $< -o $@ $(LFLAGS) 
+	@echo "CC <= $<"
+
+$(TARGET): $(OBJ_PATH)/server.o $(OBJ_PATH)/object_detector.o $(OBJ_PATH)/ujpeg.o $(LIB_PATH)/libmbedcrypto.so $(LIB_PATH)/libmbedtls.so $(LIB_PATH)/libmbedx509.so $(LIB_PATH)/libtensorflowlite_c.so	
 	@echo $(CC) $^ -o $@ $(LFLAGS)
-	$(CC) $^ -o $@ $(LFLAGS)
+	$(CC) $^ -o $@ $(LFLAGS) 
 	@echo "CC <= $^"
 
 

@@ -37,6 +37,7 @@
 #include <curl/curl.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <math.h>
 
 /* print library include */
 #define mbedtls_fprintf fprintf
@@ -52,7 +53,8 @@
 #include <mbedtls/ssl.h>
 #include <mbedtls/x509.h>
 
-#include "tensorflow/lite/c/c_api.h"
+#include "object_detector.h"
+#include "ujpeg.h"
 
 /* RA-TLS: on server, only need ra_tls_create_key_and_crt() to create keypair and X.509 cert */
 int (*ra_tls_create_key_and_crt_f)(mbedtls_pk_context* key, mbedtls_x509_crt* crt);
@@ -77,6 +79,9 @@ static void my_debug(void* ctx, int level, const char* file, int line, const cha
 /* main function declaration */
 int main(void) {
     int ret;
+    char* model_name = "host/mobilenet_v1_1.0_224.tflite";
+    char* label_file = "host/labels.txt";
+    char* image_file = "host/image.jpeg";
     size_t len;
     mbedtls_net_context listen_fd;
     mbedtls_net_context client_fd;
@@ -229,12 +234,12 @@ reset:
     mbedtls_printf("[+]  < Get model from client:\n");
     fflush(stdout);
     {
-    	char* filename = "host/mobilenet_v1_1.0_224.tflite";
-    	FILE *fp = fopen(filename, "a");
+    	//char* filename = "host/mobilenet_v1_1.0_224.tflite";
+    	FILE *fp = fopen(model_name, "a");
     	char rcvbuffer[SIZE];
 
     	if (fp == NULL)
-	    	mbedtls_printf("[+] File %s cannot be opened file on server.\n", filename);
+	    	mbedtls_printf("[+] File %s cannot be opened file on server.\n", model_name);
     	else
     	{
 	    	bzero (rcvbuffer, SIZE);
@@ -270,51 +275,6 @@ reset:
     	}
     }
 
-    /******************************* RECEIVE LABELS FROM CLIENT ************************************/
-    mbedtls_printf("[+]  < Get labels from client:\n");
-    fflush(stdout);
-    {
-        char* file2 = "host/labels.txt";
-        FILE *label = fopen(file2, "a");
-        char rcvbuf[SIZE];
-
-        if (label == NULL)
-                mbedtls_printf("[+] File %s cannot be opened file on server.\n", file2);
-        else
-        {
-                bzero (rcvbuf, SIZE);
-                int label_block_sz = 0;
-                while ((label_block_sz = mbedtls_ssl_read(&ssl, rcvbuf, SIZE)) > 0)
-                {
-                        int write_sz2 = fwrite(rcvbuf, sizeof(char), label_block_sz, label);
-                        if (write_sz2 < label_block_sz)
-                        {
-                                perror ("[-] Writing file failed on server.\n");
-                        }
-                        bzero (rcvbuf, SIZE);
-                        if (label_block_sz == 0 || label_block_sz != 1024)
-                        {
-                                break;
-                        }
-                }
-                if (label_block_sz < 0)
-                {
-                        if (errno == EAGAIN)
-                        {
-                                mbedtls_printf("read() timed out.\n");
-                        }
-                        else
-                        {
-                                mbedtls_fprintf(stderr, "read() failed due to errno = %d\n", errno);
-                                exit(1);
-                        }
-                }
-                mbedtls_printf("[+] OK\n");
-                mbedtls_printf("[+] Received from client!\n");
-                fclose(label);
-        }
-    }
-	
     /******************************** WRITING RESPONSE TO THE CLIENT ********************************/
     /* Send response to client */
     mbedtls_printf("\n\n[+]  > Write to client:\n");
@@ -396,12 +356,12 @@ next_conn:
     mbedtls_printf("[+]  < Get data from client:\n");
     fflush(stdout);
     {
-        char* filename = "host/image.bmp";
-        FILE *fp = fopen(filename, "a");
+        //char* filename = "host/image.bmp";
+        FILE *fp = fopen(image_file, "a");
         char rcvbuffer[SIZE];
 
         if (fp == NULL)
-                mbedtls_printf("[+] File %s cannot be opened file on server.\n", filename);
+                mbedtls_printf("[+] File %s cannot be opened file on server.\n", image_file);
         else
         {
                 bzero (rcvbuffer, SIZE);
@@ -438,15 +398,23 @@ next_conn:
     }
 
     /*********************************** RUNNING THE APPLICATION ************************************/
-
+    mbedtls_printf("\n[+] Running the model with the input image from data client\n");
     
+    char buffer[1024];
+    ObjectDetector(model_name, image_file, buffer);
+    mbedtls_printf("%s", buffer);
 
+    //mbedtls_printf("[+] Category: %.0f", category);
+    //mbedtls_printf(", probability: %f\n", probability);
+
+    mbedtls_printf("[+] Finished running the model and prepare to write the result to the client\n");
+    
     /******************************** WRITING RESPONSE TO THE CLIENT ********************************/
     /* Send response to client */
-    mbedtls_printf("\n\n[+]  > Write to client:\n");
+    mbedtls_printf("\n\n[+] Send the image classification result to the data client:\n");
     fflush(stdout);
 
-    len = sprintf((char*)buf, HTTP_RESPONSE, mbedtls_ssl_get_ciphersuite(&ssl));
+    len = sprintf((char*)buf, buffer, mbedtls_ssl_get_ciphersuite(&ssl));
 
     while ((ret = mbedtls_ssl_write(&ssl, buf, len)) <= 0) {
         if (ret == MBEDTLS_ERR_NET_CONN_RESET) {

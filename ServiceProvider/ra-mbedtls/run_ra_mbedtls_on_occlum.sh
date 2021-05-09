@@ -16,15 +16,19 @@ cp ../lib/libmbedtls.so image/$occlum_glibc
 cp ../lib/libmbedtls.so.13 image/$occlum_glibc
 cp ../lib/libmbedx509.so image/$occlum_glibc
 cp ../lib/libmbedx509.so.1 image/$occlum_glibc
+cp ../lib/libtensorflowlite_c.so image/$occlum_glibc
 cp ../lib/libra_tls_attest.so image/lib
 
 # Copy ra-tls-server image to image/bin
 cp ../bin/ra-tls-server image/bin
+#cp ../../../demos/tensorflow_lite/tensorflow_src/tensorflow/lite/tools/make/gen/linux_x86_64/bin/label_image image/bin
 
 # Copy network libraries to image/$occlum_glibc
 cp $occlum_glibc/libnss_files.so.2 image/$occlum_glibc
 cp $occlum_glibc/libnss_dns.so.2 image/$occlum_glibc
 cp $occlum_glibc/libdl.so.2 image/$occlum_glibc
+cp $occlum_glibc/librt.so.1 image/$occlum_glibc
+cp /usr/local/occlum/x86_64-linux-musl/lib/libz.so.1 image/lib
 cp /etc/nsswitch.conf image/etc
 cp /etc/resolv.conf image/etc
 cp /etc/host.conf image/etc
@@ -42,3 +46,5 @@ occlum build
 echo -e "${BLUE}occlum run /bin/ra-tls-server${NC}"
 occlum run /bin/ra-tls-server
 
+cd ..
+make clean
