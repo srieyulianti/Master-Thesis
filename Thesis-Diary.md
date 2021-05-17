@@ -1,3 +1,41 @@
+## 2021-05-17
+    1. Tried to measure some performance;
+    2. Collected some graphs;
+
+### Action points until next meeting:
+    1. Performance evaluation:
+      * Only consider the larger measurement sets (1000 runs)
+      * Make tables with a simple statistical analysis of the numbers;
+      * Use large datasets of images to test data transfers
+      * Implement a FIFO queue of 5 images in the enclave for measuring the performance of writing from enclave to client (to eliminate caching effects)
+    2. Security evaluation;
+    3. Nicolae - read and comment on the thesis: https://www.overleaf.com/project/5ff61a40f9a6ba2d4b379c6c
+
+
+## 2021-05-10
+    1. Good progress, entire system works;
+    2. Challenge: integrate TFLite inference C API with existing code and running the model inside the enclave, solved by creating an application in C that can be called inside the enclave.
+    3. DL for submitting report: May 31st
+    4. Investigate file transfer issues were solved; could not transfer through socket, had to allocate a buffer instead;
+
+### Action points until next meeting:
+    1. Performance evaluation - various aspects such as enclave setup speed, attestation, data streaming speed, etc;
+    2. Security evaluation;
+    3. Nicolae - read and comment on the thesis.
+
+## 2021-04-30
+    1. Had issues accessing the VM, issues now resolved;
+    2. Client updated to NOT have to run inside an enclave;
+    3. File transfer does not fully work - needs more investigation;
+    4. running CURL from inside the enclave did not work;
+    5. Thesis report written until implementation; need to modify implementation according to the latest changes; methodology to be updated with the evaluation approach/framework.
+
+### Action points until next meeting:
+    1. Investigate file transfer issues - try with smaller size first (< 16 M), to exclude size limits; next check the transfer logic;
+    2. Data streaming;
+    3. Performance testing.
+
+
 ## 2021-04-23
     1. Implement RA-TLS with Occlum and mbedTLS (using Occlum ra-mbedtls, dcap)
     2. can the verifier (client) be run outside of an enclave? most likely,
