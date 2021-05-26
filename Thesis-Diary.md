@@ -1,3 +1,10 @@
+## 2021-05-24
+    1. Improved graphs;
+    2. Continued writing the report;
+
+### Action points until next meeting:
+    1. Write the thesis report, address comments.
+
 ## 2021-05-17
     1. Tried to measure some performance;
     2. Collected some graphs;
