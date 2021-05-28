@@ -20,4 +20,4 @@ https://software.intel.com/content/www/us/en/develop/articles/intel-software-gua
 Synchronize the guideline in that link with the original DCAP project in the following link:
 https://github.com/intel/SGXDataCenterAttestationPrimitives
 
-Make sure both sample codes, the Quote Generation and the Quote Verification works successfully. 
+Make sure both sample codes, the Quote Generation and the Quote Verification work successfully. 
