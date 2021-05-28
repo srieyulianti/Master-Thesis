@@ -7,7 +7,7 @@ This repository consists of all resources that are used to build a master thesis
 
 # Getting Started
 
-If you have not installed SGX driver in your platform, please follow either one of the links below:
+If you have not installed SGX driver in your platform, please follow either one of these links below:
 1. https://download.01.org/intel-sgx/sgx-linux/2.11/docs/Intel_SGX_Installation_Guide_Linux_2.11_Open_Source.pdf
 2. https://github.com/intel/linux-sgx-driver
 
