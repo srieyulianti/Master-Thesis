@@ -1,6 +1,6 @@
 # Master Thesis - Confidential Computing in Public Clouds
 
-This repository consists of all resources that are used to build a master thesis topic as written above. Three main folders as below are source code used for implementation
+This repository consists of all resources that are used to build a master thesis topic as written above. Three main folders below are source code used for implementation:
 1. ServiceProvider = server repository who owns SGX capable machine
 2. MLClient = client repository who owns a machine learning model
 3. DataClient = client repository who owns data for the machine learning model
@@ -21,3 +21,5 @@ Synchronize the guideline in that link with the original DCAP project in the fol
 https://github.com/intel/SGXDataCenterAttestationPrimitives
 
 Make sure both sample codes, the Quote Generation and the Quote Verification work successfully. 
+
+
