@@ -29,5 +29,27 @@ https://medium.com/techanic/docker-containers-ipc-using-sockets-part-2-834e8ea00
 
 1. Install ServiceProvider in one Occlum container including the port interface for networking:
 `docker run --network=interface_name --name server --expose port_number -it --device /dev/sgx occlum/occlum:version-ubuntu_version`
+2. Install MLClient in one Occlum container including the port interface for networking:
+`docker run --network=interface_name --name ml_client --expose port_number -it --device /dev/sgx occlum/occlum:version-ubuntu_version`
+3. Install DataClient in one Occlum container including the port interface for networking:
+`docker run --network=interface_name --name data_client --expose port_number -it --device /dev/sgx occlum/occlum:version-ubuntu_version`
+
+# Run Program
+To run ServiceProvider:
+`make clean'
+`make`
+`./run_ra_mbedtls_on_occlum.sh`
+
+To run MLClient:
+`make clean`
+`make`
+`./run_ra_mbedtls_on_linux.sh`
+
+To run DataClient:
+`make clean`
+`make`
+`./run_ra_mbedtls_on_linux.sh`
+
+
 
 
