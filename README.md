@@ -22,4 +22,12 @@ https://github.com/intel/SGXDataCenterAttestationPrimitives
 
 Make sure both sample codes, the Quote Generation and the Quote Verification work successfully. 
 
+# Build Program
+
+To build the program, those instances (ServiceProvider, MLClient, and DataClient) should be installed in different Docker containers. Therefore, it will be better to install Occlum software by using Docker container. It is also important to create a new network interface to support communication between two or more docker containers. Follow the following website to configure the interface:
+https://medium.com/techanic/docker-containers-ipc-using-sockets-part-2-834e8ea00768
+
+1. Install ServiceProvider in one Occlum container including the port interface for networking:
+    `docker run --network=interface_name --name server --expose port_number -it --device /dev/sgx occlum/occlum:version-ubuntu_version`
+
 
