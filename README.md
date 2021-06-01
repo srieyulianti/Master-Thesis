@@ -43,6 +43,7 @@ docker run --network=interface_name --name data_client --expose port_number -it 
 # Run Program
 1. To run ServiceProvider:
 ```
+cd ServiceProvider/ra-mbedtls
 make clean
 make
 ./run_ra_mbedtls_on_occlum.sh
@@ -50,6 +51,7 @@ make
 
 2. To run MLClient:
 ```
+cd MLClient/ra-mbedtls
 make clean
 make
 ./run_ra_mbedtls_on_linux.sh
@@ -57,6 +59,7 @@ make
 
 3. To run DataClient:
 ```
+cd DataClient/ra-mbedtls
 make clean
 make
 ./run_ra_mbedtls_on_linux.sh
