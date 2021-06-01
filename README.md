@@ -48,14 +48,14 @@ make
 ./run_ra_mbedtls_on_occlum.sh
 ```
 
-To run MLClient:
+2. To run MLClient:
 ```
 make clean
 make
 ./run_ra_mbedtls_on_linux.sh
 ```
 
-To run DataClient:
+3. To run DataClient:
 ```
 make clean
 make
