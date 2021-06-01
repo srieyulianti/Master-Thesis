@@ -28,6 +28,6 @@ To build the program, those instances (ServiceProvider, MLClient, and DataClient
 https://medium.com/techanic/docker-containers-ipc-using-sockets-part-2-834e8ea00768
 
 1. Install ServiceProvider in one Occlum container including the port interface for networking:
-    `docker run --network=interface_name --name server --expose port_number -it --device /dev/sgx occlum/occlum:version-ubuntu_version`
+`docker run --network=interface_name --name server --expose port_number -it --device /dev/sgx occlum/occlum:version-ubuntu_version`
 
 
