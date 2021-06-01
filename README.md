@@ -36,9 +36,11 @@ https://medium.com/techanic/docker-containers-ipc-using-sockets-part-2-834e8ea00
 
 # Run Program
 To run ServiceProvider:
-`make clean',
-`make`,
-`./run_ra_mbedtls_on_occlum.sh`
+```
+make clean
+make
+./run_ra_mbedtls_on_occlum.sh
+```
 
 To run MLClient:
 `make clean`,
