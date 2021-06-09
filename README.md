@@ -46,6 +46,7 @@ docker run --network=interface_name --name data_client --expose port_number -it 
 cd ServiceProvider/ra-mbedtls
 make clean
 make
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib
 ./run_ra_mbedtls_on_occlum.sh
 ```
 
@@ -54,6 +55,7 @@ make
 cd MLClient/ra-mbedtls
 make clean
 make
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib
 ./run_ra_mbedtls_on_linux.sh
 ```
 
@@ -62,6 +64,7 @@ make
 cd DataClient/ra-mbedtls
 make clean
 make
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib
 ./run_ra_mbedtls_on_linux.sh
 ```
 
