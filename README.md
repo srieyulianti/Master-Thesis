@@ -41,6 +41,17 @@ docker run --network=interface_name --name data_client --expose port_number -it 
 ```
 
 # Run Program
+First, check the container names:
+```
+docker ps -a
+```
+Run each container with the following commands:
+```
+docker exec -it server /bin/bash
+docker exec -it ml_client /bin/bash
+docker exec -it data_client /bin/bash
+```
+
 1. To run ServiceProvider:
 ```
 cd ServiceProvider/ra-mbedtls
