@@ -79,9 +79,9 @@ static void my_debug(void* ctx, int level, const char* file, int line, const cha
 /* main function declaration */
 int main(void) {
     int ret;
-    char* model_name = "host/mobilenet_v1_1.0_224.tflite";
-    char* label_file = "host/labels.txt";
-    char* image_file = "host/image.jpeg";
+    char* model_name = "mobilenet_v1_1.0_224.tflite";
+    char* label_file = "labels.txt";
+    char* image_file = "image.jpeg";
     size_t len;
     mbedtls_net_context listen_fd;
     mbedtls_net_context client_fd;
