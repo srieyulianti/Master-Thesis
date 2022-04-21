@@ -1,4 +1,4 @@
-# Master Thesis - Confidential Computing in Public Clouds
+# Confidential Computing in Public Clouds
 
 This repository consists of all resources that are used to build a master thesis topic as written above. Three main folders below are source code used for implementation:
 1. ServiceProvider = server repository who owns SGX capable machine
